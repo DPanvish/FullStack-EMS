@@ -1,0 +1,35 @@
+Setup Steps
+===========
+
+1. Created the frontend app inside the `client` folder and installed npm packages.
+   Command:
+   `npm create vite@latest client -- --template react`
+   `cd client`
+   `npm install`
+
+   Dependencies installed:
+   - `react` (`^19.2.5`): Core UI library used to build the frontend as reusable components.
+   - `react-dom` (`^19.2.5`): Renders the React component tree into the browser DOM.
+
+   Development dependencies installed:
+   - `vite` (`^8.0.10`): Frontend build tool and development server for fast local development.
+   - `@vitejs/plugin-react` (`^6.0.1`): Adds React support to Vite, including JSX handling and React refresh behavior.
+   - `eslint` (`^10.2.1`): Checks JavaScript and React code for errors and style issues.
+   - `@eslint/js` (`^10.0.1`): Provides the recommended base JavaScript linting rules for ESLint.
+   - `eslint-plugin-react-hooks` (`^7.1.1`): Enforces the Rules of Hooks so React hooks are used correctly.
+   - `eslint-plugin-react-refresh` (`^0.5.2`): Helps keep components compatible with React Fast Refresh during development.
+   - `globals` (`^17.5.0`): Supplies known browser and JavaScript global variables for ESLint configuration.
+   - `@types/react` (`^19.2.14`): Type definitions for React, useful for editor IntelliSense and tooling.
+   - `@types/react-dom` (`^19.2.3`): Type definitions for React DOM, useful for editor IntelliSense and tooling.
+
+2. Installed frontend UI, routing, styling, and notification packages.
+   Command:
+   `cd client`
+   `npm install @tailwindcss/vite tailwindcss lucide-react react-hot-toast react-router-dom`
+
+   Dependencies installed:
+   - `@tailwindcss/vite` (`^4.2.4`): Connects Tailwind CSS with Vite so Tailwind styles can be processed during development and builds.
+   - `tailwindcss` (`^4.2.4`): Utility-first CSS framework used to style the React frontend quickly and consistently.
+   - `lucide-react` (`^1.14.0`): Provides reusable React icon components for buttons, navigation, and other UI elements.
+   - `react-hot-toast` (`^2.6.0`): Adds lightweight toast notifications for user feedback such as success, error, and loading messages.
+   - `react-router-dom` (`^7.15.0`): Adds client-side routing so the React app can support multiple pages and navigation paths.
