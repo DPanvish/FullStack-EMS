@@ -1,6 +1,20 @@
 @import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
 
+@theme {
+    --color-indigo-50: #f6f4ef;
+    --color-indigo-100: #ebe3d1;
+    --color-indigo-200: #d8c79f;
+    --color-indigo-300: #c5a76a;
+    --color-indigo-400: #a8863f;
+    --color-indigo-500: #223248;
+    --color-indigo-600: #16243a;
+    --color-indigo-700: #101b2d;
+    --color-indigo-800: #0b1422;
+    --color-indigo-900: #070e19;
+    --color-indigo-950: #030812;
+}
+
 * {
     font-family: "Outfit", "Inter";
 }
