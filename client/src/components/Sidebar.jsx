@@ -108,11 +108,18 @@ const Sidebar = () => {
       <button 
         onClick={() => setMobileOpen(true)}
         className="sidebar-mobile-menu"
+        aria-label="Open navigation menu"
       >
         <MenuIcon size={20} />
       </button>
 
-      {mobileOpen && <div className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={() => setMobileOpen(false)} />}
+      {mobileOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
       {/* Sidebar Desktop */}
       <aside className="hidden lg:flex flex-col h-full w-65 sidebar-shell shrink-0 border-r">
