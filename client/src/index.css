@@ -20,6 +20,77 @@
 }
 
 @layer utilities {
+    /* Sidebar styles */
+    .sidebar-shell {
+        @apply bg-linear-to-b from-indigo-950 via-indigo-900 to-indigo-800 text-white border-indigo-200/10;
+    }
+    .sidebar-divider-bottom {
+        @apply border-b border-indigo-200/10;
+    }
+    .sidebar-divider-top {
+        @apply border-t border-indigo-200/10;
+    }
+    .sidebar-brand-mark {
+        @apply size-9 rounded-lg bg-indigo-200/10 ring-1 ring-indigo-200/20 flex items-center justify-center;
+    }
+    .sidebar-brand-icon {
+        @apply text-indigo-100 size-5;
+    }
+    .sidebar-title {
+        @apply font-semibold text-[13px] text-indigo-50 tracking-wide;
+    }
+    .sidebar-subtitle {
+        @apply text-[11px] text-indigo-200/60 font-medium;
+    }
+    .sidebar-close {
+        @apply lg:hidden text-indigo-200/60 hover:text-indigo-50 p-1;
+    }
+    .sidebar-profile-card {
+        @apply mx-3 mt-4 mb-1 p-3 rounded-lg bg-indigo-50/5 border border-indigo-200/10 shadow-sm shadow-black/20;
+    }
+    .sidebar-profile-avatar {
+        @apply w-9 h-9 rounded-lg bg-indigo-200/12 flex items-center justify-center ring-1 ring-indigo-200/20 shrink-0;
+    }
+    .sidebar-profile-initial {
+        @apply text-indigo-100 text-xs font-semibold;
+    }
+    .sidebar-profile-name {
+        @apply text-[13px] font-medium text-indigo-50 truncate;
+    }
+    .sidebar-profile-role {
+        @apply text-[11px] text-indigo-200/55 truncate;
+    }
+    .sidebar-nav-label {
+        @apply text-[10px] font-semibold uppercase tracking-[0.12em] text-indigo-200/50;
+    }
+    .sidebar-nav-link {
+        @apply flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium transition-all duration-150 relative;
+    }
+    .sidebar-nav-link-active {
+        @apply bg-indigo-200/12 text-indigo-50 shadow-sm shadow-black/20;
+    }
+    .sidebar-nav-link-inactive {
+        @apply text-slate-300 hover:text-indigo-50 hover:bg-indigo-50/6;
+    }
+    .sidebar-active-marker {
+        @apply absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-indigo-300;
+    }
+    .sidebar-nav-icon-active {
+        @apply text-indigo-200;
+    }
+    .sidebar-nav-icon-inactive {
+        @apply text-slate-400 group-hover:text-indigo-100;
+    }
+    .sidebar-active-chevron {
+        @apply w-3.5 h-3.5 text-indigo-200/60;
+    }
+    .sidebar-mobile-menu {
+        @apply lg:hidden fixed top-4 left-4 z-50 p-2 bg-indigo-950 text-indigo-50 rounded-lg shadow-lg border border-indigo-200/15;
+    }
+    .sidebar-logout {
+        @apply flex items-center gap-3 w-full px-3 py-2.5 rounded-md text-[13px] font-medium text-indigo-200/65 hover:text-rose-300 hover:bg-rose-500/10 transition-all duration-150;
+    }
+
     /* Card styles */
     .card {
         @apply bg-white rounded-lg border border-slate-200/70;
