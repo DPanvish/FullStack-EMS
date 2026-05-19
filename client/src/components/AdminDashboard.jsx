@@ -1,11 +1,14 @@
 import { Building2Icon, CalendarIcon, FileTextIcon, UsersIcon } from "lucide-react";
 
-const AdminDashboard = ({data}) => {
+const AdminDashboard = ({data = {}}) => {
+  if (!data) {
+    return <div className="text-center text-slate-500 py-12">No dashboard data available</div>
+  }
 
   const stats = [
     {
       icon: UsersIcon,
-      value: data.totalEmployees,
+      value: data.totalEmployees ?? 0,
       label: "Total Employees",
       description: "Active workforce",
     },
