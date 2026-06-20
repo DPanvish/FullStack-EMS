@@ -35,7 +35,7 @@ const EmployeeForm = ({initialData, onSuccess, onCancel}) => {
           </div>
           <div className="sm:col-span-2">
             <label className="block mb-2">Bio (Optional)</label>
-            <textarea name="bio" required defaultValue={initialData?.bio} rows={3} className="resize-none" placeholder="Brief description..." />
+            <textarea name="bio" defaultValue={initialData?.bio} rows={3} className="resize-none" placeholder="Brief description..." />
           </div>
         </div>
       </div>

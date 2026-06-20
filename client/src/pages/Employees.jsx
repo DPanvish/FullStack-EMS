@@ -42,7 +42,7 @@ const Employees = () => {
       </div>
 
         {/* Search Bar */}
-        <div className="flex flex-col sm:flex-row gsp-3 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <div className="relative flex-1">
                 <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <input
@@ -110,7 +110,7 @@ const Employees = () => {
 
         {/* Edit Employee Modal */}
         {editEmployee && (
-          <div className="fixed inset-0 z-0 flex items-start justify-center p-4 overflow-y-auto bg-black/40 backdrop-blur-sm" onClick={() => setEditEmployee(null)}>
+          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto bg-black/40 backdrop-blur-sm" onClick={() => setEditEmployee(null)}>
             <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-8 animate-fade-in" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between p-6 pb-0">
                 <div>
