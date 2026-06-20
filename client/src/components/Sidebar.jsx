@@ -7,7 +7,7 @@ const Sidebar = () => {
   const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const role = "EMPLOYEE";
+  const role = "ADMIN";
   const userName = [dummyProfileData?.firstName, dummyProfileData?.lastName]
     .filter(Boolean)
     .join(" ")
