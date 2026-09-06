@@ -3,6 +3,7 @@ import { dummyLeaveData } from "../assets/assets"
 import { PalmtreeIcon, PlusIcon, ThermometerIcon, UmbrellaIcon } from "lucide-react";
 import Loading from "../components/Loading";
 import LeaveHistory from "../components/leave/LeaveHistory";
+import ApplyLeaveModal from "../components/leave/ApplyLeaveModal";
 
 const Leave = () => {
   const [leaves, setLeaves] = useState([]);
@@ -87,6 +88,7 @@ const Leave = () => {
       )}
 
       <LeaveHistory leaves={leaves} isAdmin={isAdmin} onUpdate={fetchLeaves} />
+      <ApplyLeaveModal open={showModal} onClose={() => setShowModal(false)} onSuccess={fetchLeaves} />
     </div>
   )
 }
