@@ -251,6 +251,84 @@
         @apply text-xs opacity-80;
     }
 
+    /* Leave styles */
+    .leave-stat-card {
+        @apply bg-linear-to-br from-white via-indigo-50/35 to-white rounded-lg border border-indigo-200/35 p-5 sm:p-6 flex items-center gap-4 relative overflow-hidden hover:-translate-y-0.5 hover:border-indigo-300/60 hover:shadow-md hover:shadow-indigo-950/10 transition-all duration-300;
+    }
+    .leave-stat-accent {
+        @apply absolute left-0 top-0 bottom-0 w-1 rounded-r-full bg-indigo-300/70 group-hover:bg-indigo-400/80 transition-colors duration-200;
+    }
+    .leave-stat-icon-box {
+        @apply p-3 bg-indigo-100/80 rounded-lg ring-1 ring-indigo-200/70 group-hover:bg-indigo-200/80 transition-colors duration-200;
+    }
+    .leave-stat-icon {
+        @apply w-5 h-5 text-indigo-700 group-hover:text-indigo-900 transition-colors duration-200;
+    }
+    .leave-stat-label {
+        @apply text-sm text-indigo-700/70;
+    }
+    .leave-stat-value {
+        @apply text-2xl font-bold text-indigo-950 tracking-tight;
+    }
+    .leave-stat-unit {
+        @apply text-sm font-normal text-indigo-400;
+    }
+    .leave-history-card {
+        @apply bg-white rounded-lg border border-indigo-200/35 overflow-hidden shadow-sm shadow-indigo-950/5;
+    }
+    .leave-empty {
+        @apply text-center py-12 text-indigo-400;
+    }
+    .leave-employee-cell {
+        @apply text-indigo-950 font-medium;
+    }
+    .leave-type-badge {
+        @apply inline-flex items-center px-2.5 py-1 rounded-md text-xs bg-indigo-100/80 text-indigo-700 ring-1 ring-indigo-200/70;
+    }
+    .leave-date-cell {
+        @apply text-xs text-indigo-700/70;
+    }
+    .leave-reason-cell {
+        @apply max-w-xs truncate text-indigo-700/70;
+    }
+    .leave-actions {
+        @apply flex justify-center gap-2;
+    }
+    .leave-approve-button {
+        @apply p-1.5 rounded-md bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors disabled:opacity-50;
+    }
+    .leave-reject-button {
+        @apply p-1.5 rounded-md bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors disabled:opacity-50;
+    }
+    .leave-modal-backdrop {
+        @apply fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm;
+    }
+    .leave-modal-panel {
+        @apply relative bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-indigo-200/40;
+        animation: fadeIn 0.4s ease-out;
+    }
+    .leave-modal-title {
+        @apply text-lg font-semibold text-indigo-950;
+    }
+    .leave-modal-subtitle {
+        @apply text-sm text-indigo-700/60 mt-0.5;
+    }
+    .leave-modal-close {
+        @apply p-2 rounded-lg hover:bg-indigo-50 transition-colors text-indigo-400 hover:text-indigo-700;
+    }
+    .leave-form-label {
+        @apply flex items-center gap-2 text-sm font-medium text-indigo-800 mb-2;
+    }
+    .leave-form-icon {
+        @apply w-4 h-4 text-indigo-400;
+    }
+    .leave-form-helper {
+        @apply block text-xs text-indigo-400 mb-1;
+    }
+    .leave-reason-label {
+        @apply text-sm font-medium text-indigo-800 mb-2 block;
+    }
+
     /* Card styles */
     .card {
         @apply bg-white rounded-lg border border-slate-200/70;
