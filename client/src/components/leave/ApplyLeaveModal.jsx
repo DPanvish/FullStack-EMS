@@ -18,17 +18,16 @@ const ApplyLeaveModal = ({open, onClose, onSuccess}) => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-fade-in" onClick={(e) => e.stopPropagation()}>
+    <div className="leave-modal-backdrop" onClick={onClose}>
+      <div className="leave-modal-panel" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between p-6 pb-0">
           <div>
-            <h2 className="text-lg font-semibold text-slate-800">Apply for Leave</h2>
-            <p className="text-sm text-slate-400 mt-0.5">Submit your leave request for approval</p>
-            <p></p>
+            <h2 className="leave-modal-title">Apply for Leave</h2>
+            <p className="leave-modal-subtitle">Submit your leave request for approval</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-600"
+            className="leave-modal-close"
           >
             <X className="w-5 h-5" />
           </button>
@@ -36,8 +35,8 @@ const ApplyLeaveModal = ({open, onClose, onSuccess}) => {
         
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-              <FileText className="w-4 h-4 text-slate-400" />
+            <label className="leave-form-label">
+              <FileText className="leave-form-icon" />
               Leave Type
             </label>
             <select name="type" required>
@@ -48,23 +47,23 @@ const ApplyLeaveModal = ({open, onClose, onSuccess}) => {
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
-              <CalendarDays className="w-4 h-4 text-slate-400" /> Duration
+            <label className="leave-form-label">
+              <CalendarDays className="leave-form-icon" /> Duration
             </label>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="block text-xs text-slate-400 mb-1">From</span>
+                <span className="leave-form-helper">From</span>
                 <input type="date" name="startDate" required min={minDate} />
               </div>
               <div>
-                <span className="block text-xs text-slate-400 mb-1">To</span>
+                <span className="leave-form-helper">To</span>
                 <input type="date" name="startDate" required min={minDate} />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="text-sm font-medium text-slate-700 mb-2 block">
+            <label className="leave-reason-label">
               Reason
             </label>
             <textarea name="reason" required rows={3} className="resize-none" placeholder="Briefly describe why you need this leave..." />
@@ -83,7 +82,7 @@ const ApplyLeaveModal = ({open, onClose, onSuccess}) => {
               onClick={onClose}
               disabled={loading}
               type="submit"
-              className="btn-primary flex-1 flex- items-center justify-center gap-2"
+              className="btn-primary flex-1 flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               {loading ? "Submitting..." : "Submit"}
