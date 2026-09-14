@@ -28,7 +28,7 @@ const Payslips = () => {
   })
 
   if(loading){
-    <Loading />
+    return <Loading />
   }
 
   return (

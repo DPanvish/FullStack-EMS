@@ -21,20 +21,20 @@ const GeneratePayslipForm = ({employees, onSuccess}) => {
     )
   }
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex ites-center justify-center z-50 p-4">
-      <div className="card max-w-lg w-full p-6 animate-slide-up">
+    <div className="payslip-modal-backdrop">
+      <div className="payslip-modal-panel">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-bold text-slate-900">Generate Monthly Payslip</h3>
+          <h3 className="payslip-modal-title">Generate Monthly Payslip</h3>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-slate-400 hover:text-slate-600 p-1"
+            className="payslip-modal-close"
           >
             <X size={20} />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Employee</label>
+            <label className="payslip-form-label">Employee</label>
             <select name="employeeId" required>
               {employees.map((e) => (
                 <option key={e.id} value={e.id}>
@@ -46,7 +46,7 @@ const GeneratePayslipForm = ({employees, onSuccess}) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Month</label>
+              <label className="payslip-form-label">Month</label>
               <select name="month">
                 {Array.from({length: 12}, (_, i) => i + 1).map((m) => (
                   <option key={m} value={m}>
@@ -56,23 +56,23 @@ const GeneratePayslipForm = ({employees, onSuccess}) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Month</label>
+              <label className="payslip-form-label">Year</label>
               <input type="number" name="year" defaultValue={new Date().getFullYear()} />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">Basic Salary</label>
+            <label className="payslip-form-label">Basic Salary</label>
             <input type="number" name="basicSalary" required placeholder="5000" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Allowances</label>
+              <label className="payslip-form-label">Allowances</label>
               <input type="number" name="allowances" defaultValue="0" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Deductions</label>
+              <label className="payslip-form-label">Deductions</label>
               <input type="number" name="deductions" defaultValue="0" />
             </div>
           </div>
