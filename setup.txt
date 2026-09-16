@@ -1,35 +1,67 @@
 Setup Steps
 ===========
 
-1. Created the frontend app inside the `client` folder and installed npm packages.
+1. Created the frontend app inside the `client` folder with the React Vite template.
+
+   Commands:
+
+   ```bash
+   npm create vite@latest client -- --template react
+   cd client
+   npm install
+   ```
+
+2. Installed frontend UI, routing, styling, notification, icon, and date utility packages.
+
    Command:
-   `npm create vite@latest client -- --template react`
-   `cd client`
-   `npm install`
 
-   Dependencies installed:
-   - `react` (`^19.2.5`): Core UI library used to build the frontend as reusable components.
-   - `react-dom` (`^19.2.5`): Renders the React component tree into the browser DOM.
+   ```bash
+   npm install @tailwindcss/vite tailwindcss lucide-react react-hot-toast react-router-dom date-fns
+   ```
 
-   Development dependencies installed:
-   - `vite` (`^8.0.10`): Frontend build tool and development server for fast local development.
-   - `@vitejs/plugin-react` (`^6.0.1`): Adds React support to Vite, including JSX handling and React refresh behavior.
-   - `eslint` (`^10.2.1`): Checks JavaScript and React code for errors and style issues.
-   - `@eslint/js` (`^10.0.1`): Provides the recommended base JavaScript linting rules for ESLint.
-   - `eslint-plugin-react-hooks` (`^7.1.1`): Enforces the Rules of Hooks so React hooks are used correctly.
-   - `eslint-plugin-react-refresh` (`^0.5.2`): Helps keep components compatible with React Fast Refresh during development.
-   - `globals` (`^17.5.0`): Supplies known browser and JavaScript global variables for ESLint configuration.
-   - `@types/react` (`^19.2.14`): Type definitions for React, useful for editor IntelliSense and tooling.
-   - `@types/react-dom` (`^19.2.3`): Type definitions for React DOM, useful for editor IntelliSense and tooling.
+3. Available npm scripts from `client/package.json`.
 
-2. Installed frontend UI, routing, styling, and notification packages.
-   Command:
-   `cd client`
-   `npm install @tailwindcss/vite tailwindcss lucide-react react-hot-toast react-router-dom`
+   ```bash
+   npm run dev      # Start the Vite development server.
+   npm run build    # Create a production build.
+   npm run preview  # Preview the production build locally.
+   npm run lint     # Run ESLint against the client source.
+   ```
 
-   Dependencies installed:
-   - `@tailwindcss/vite` (`^4.2.4`): Connects Tailwind CSS with Vite so Tailwind styles can be processed during development and builds.
-   - `tailwindcss` (`^4.2.4`): Utility-first CSS framework used to style the React frontend quickly and consistently.
-   - `lucide-react` (`^1.14.0`): Provides reusable React icon components for buttons, navigation, and other UI elements.
-   - `react-hot-toast` (`^2.6.0`): Adds lightweight toast notifications for user feedback such as success, error, and loading messages.
-   - `react-router-dom` (`^7.15.0`): Adds client-side routing so the React app can support multiple pages and navigation paths.
+Current Dependencies
+====================
+
+- `@tailwindcss/vite` (`^4.2.4`): Connects Tailwind CSS with Vite.
+- `date-fns` (`^4.4.0`): Provides date formatting and date utility helpers.
+- `lucide-react` (`^1.14.0`): Provides reusable React icon components.
+- `react` (`^19.2.5`): Core UI library.
+- `react-dom` (`^19.2.5`): Renders React into the browser DOM.
+- `react-hot-toast` (`^2.6.0`): Displays toast notifications.
+- `react-router-dom` (`^7.15.0`): Provides client-side routing.
+- `tailwindcss` (`^4.2.4`): Utility-first CSS framework.
+
+Current Development Dependencies
+================================
+
+- `@eslint/js` (`^10.0.1`): Recommended JavaScript linting rules.
+- `@types/react` (`^19.2.14`): React type definitions for tooling and editor support.
+- `@types/react-dom` (`^19.2.3`): React DOM type definitions for tooling and editor support.
+- `@vitejs/plugin-react` (`^6.0.1`): React support for Vite.
+- `eslint` (`^10.2.1`): JavaScript and React linting.
+- `eslint-plugin-react-hooks` (`^7.1.1`): Enforces the Rules of Hooks.
+- `eslint-plugin-react-refresh` (`^0.5.2`): Checks React Fast Refresh compatibility.
+- `globals` (`^17.5.0`): Browser and JavaScript globals for ESLint.
+- `vite` (`^8.0.10`): Frontend build tool and development server.
+
+Local Setup
+===========
+
+From a fresh clone:
+
+```bash
+cd ems/client
+npm install
+npm run dev
+```
+
+The app runs at `http://localhost:5173/` by default. If port `5173` is unavailable, Vite prints the alternate URL.

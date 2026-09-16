@@ -1,65 +1,103 @@
-# FullStack Employee Management System (EMS)
+# Employee Management System (EMS)
 
-A comprehensive Employee Management System built to streamline HR operations, track attendance, manage leave requests, and generate payslips. This system features role-based access for both Administrators and Employees.
+A frontend Employee Management System for HR workflows. The app provides separate admin and employee login paths, dashboard views, employee records, attendance tracking, leave management, payslip generation, and organization settings.
 
 ## Features
 
-- **Role-Based Authentication:** Separate portals for Admins and Employees.
-- **Dashboard:** Overview of key metrics and recent activities.
-- **Employee Management:** Add, view, update, and remove employee records.
-- **Attendance Tracking:** Monitor and manage daily employee attendance.
-- **Leave Management:** Submit, review, and approve/reject leave requests.
-- **Payslips:** Generate, view, and print employee payslips.
-- **Settings:** Customize organization and user preferences.
+- Role-based entry points for Admin and Employee portals.
+- Dashboard overview for core HR metrics and activity.
+- Employee directory with add, edit, view, and delete flows.
+- Attendance check-in/check-out tracking with history and stats.
+- Leave request submission, review, approval, and rejection.
+- Payslip generation, listing, and printable payslip pages.
+- Settings screens for organization and user preferences.
 
 ## Tech Stack
 
-**Frontend:**
-- [React](https://react.dev/) (v19) - Core UI library
-- [Vite](https://vitejs.dev/) - Build tool and development server
-- [Tailwind CSS](https://tailwindcss.com/) (v4) - Utility-first styling framework
-- [React Router DOM](https://reactrouter.com/) - Client-side routing
-- [Lucide React](https://lucide.dev/) - Icon library
-- [React Hot Toast](https://react-hot-toast.com/) - Toast notifications
+- React 19 for the UI.
+- Vite 8 for local development and production builds.
+- Tailwind CSS 4 through the Vite plugin.
+- React Router DOM 7 for client-side routing.
+- Lucide React for icons.
+- React Hot Toast for notifications.
+- date-fns for date formatting and date utilities.
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher recommended)
-- npm or yarn
+
+- Node.js 18 or newer.
+- npm, which is included with Node.js.
 
 ### Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd ems
-   ```
+```bash
+git clone <repository-url>
+cd ems/client
+npm install
+```
 
-2. **Setup the Frontend (Client):**
-   ```bash
-   cd client
-   npm install
-   ```
+### Development
 
-3. **Run the Development Server:**
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run dev
+```
 
-The application should now be running on `http://localhost:5173/` (or the port specified by Vite).
+Vite starts the app at `http://localhost:5173/` by default. If that port is already in use, Vite prints the alternate local URL in the terminal.
+
+### Build
+
+```bash
+npm run build
+```
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+### Lint
+
+```bash
+npm run lint
+```
+
+## Routes
+
+- `/login` - choose Admin or Employee login.
+- `/login/admin` - Admin portal login.
+- `/login/employee` - Employee portal login.
+- `/dashboard` - main dashboard.
+- `/employees` - employee management.
+- `/attendance` - attendance tracking.
+- `/leave` - leave management.
+- `/payslips` - payslip management.
+- `/settings` - settings.
+- `/print/payslips/:id` - printable payslip view.
 
 ## Project Structure
 
-```
+```text
 ems/
-├── client/                 # React frontend application
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── pages/          # Application routes/pages
-│   │   ├── App.jsx         # Main application routing
-│   │   └── main.jsx        # Application entry point
-│   ├── package.json        # Frontend dependencies
-│   └── vite.config.js      # Vite configuration
-└── setup.txt               # Initial setup logs and commands
+|-- README.md
+|-- setup.txt
+`-- client/
+    |-- package.json
+    |-- vite.config.js
+    |-- index.html
+    |-- public/
+    |   |-- favicon.svg
+    |   `-- icons.svg
+    `-- src/
+        |-- App.jsx
+        |-- main.jsx
+        |-- index.css
+        |-- assets/
+        |-- components/
+        `-- pages/
 ```
+
+## Notes
+
+This repository currently contains the frontend client. Data handling is implemented in the React application layer; add API configuration notes here if a backend service is connected later.

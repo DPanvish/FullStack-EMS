@@ -1,30 +1,35 @@
-# EMS Frontend (Client)
+# EMS Frontend
 
-This directory contains the frontend application for the Employee Management System (EMS), built with React, Vite, and Tailwind CSS.
+React frontend for the Employee Management System. It is built with Vite, Tailwind CSS, React Router, Lucide icons, React Hot Toast, and date-fns.
 
-## Getting Started
-
-First, install the dependencies:
+## Scripts
 
 ```bash
 npm install
+npm run dev
+npm run build
+npm run preview
+npm run lint
 ```
 
-Then, run the development server:
+## Local Development
+
+Run the development server from this directory:
 
 ```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173/`.
+The default local URL is `http://localhost:5173/`.
 
-## Key Technologies
+## App Areas
 
-- **React 19:** UI library
-- **Vite:** Build tool
-- **Tailwind CSS 4:** Styling
-- **React Router DOM:** Navigation
-- **Lucide React:** Icons
-- **React Hot Toast:** Notifications
+- Login landing page with Admin and Employee portal routes.
+- Dashboard.
+- Employee management.
+- Attendance.
+- Leave requests.
+- Payslips and printable payslip pages.
+- Settings.
 
-For more detailed information about the entire project, please refer to the [Root README](../README.md).
+For full project setup and structure, see the root [README](../README.md).
