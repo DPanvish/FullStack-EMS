@@ -36,15 +36,15 @@ const Settings = () => {
 
       {profile && <ProfileForm initialData={profile} onSuccess={fetchProfile} />}
 
-      <div className="card max-w-md p-6 flex items-center justify-between">
+      <div className="settings-password-card">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-slate-100 rounded-lg">
-            <Lock className="w-5 h-5 text-slate-600" />
+          <div className="settings-icon-box">
+            <Lock className="settings-icon" />
           </div>
 
           <div>
-            <p className="font-medium text-slate-900">Password</p>
-            <p className="text-sm text-slate-500">Update your account password</p>
+            <p className="settings-card-title">Password</p>
+            <p className="settings-card-subtitle">Update your account password</p>
           </div>
         </div>
 
