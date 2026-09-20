@@ -443,6 +443,66 @@
         @apply p-3 rounded-xl text-sm flex items-start gap-3 bg-rose-50 text-rose-700 border border-rose-200;
     }
 
+    /* Print payslip styles */
+    .print-payslip-missing {
+        @apply text-center py-12 text-indigo-400;
+    }
+    .print-payslip-page {
+        @apply max-w-2xl mx-auto p-8 bg-white;
+        animation: fadeIn 0.4s ease-out;
+    }
+    .print-payslip-header {
+        @apply text-center border-b border-indigo-200/45 pb-6 mb-8;
+    }
+    .print-payslip-title {
+        @apply text-2xl font-bold text-indigo-950 tracking-tight;
+    }
+    .print-payslip-period {
+        @apply text-indigo-700/70 text-sm mt-1;
+    }
+    .print-payslip-label {
+        @apply text-xs text-indigo-400 uppercase tracking-wider mb-1;
+    }
+    .print-payslip-value {
+        @apply font-semibold text-indigo-950;
+    }
+    .print-payslip-table-card {
+        @apply rounded-xl border border-indigo-200/45 overflow-hidden mb-8;
+    }
+    .print-payslip-table {
+        @apply w-full text-sm;
+    }
+    .print-payslip-head-row {
+        @apply bg-indigo-50/70;
+    }
+    .print-payslip-head-left {
+        @apply text-left py-3 px-4 text-xs text-indigo-700/70 uppercase tracking-wider;
+    }
+    .print-payslip-head-right {
+        @apply text-right py-3 px-4 text-xs text-indigo-700/70 uppercase tracking-wider;
+    }
+    .print-payslip-row {
+        @apply border-t border-indigo-100;
+    }
+    .print-payslip-desc {
+        @apply py-3 px-4 text-indigo-800;
+    }
+    .print-payslip-amount {
+        @apply text-right py-3 px-4 text-indigo-950 font-medium;
+    }
+    .print-payslip-total-row {
+        @apply border-t-2 border-indigo-200 bg-indigo-50/70;
+    }
+    .print-payslip-total-label {
+        @apply py-4 px-4 font-bold text-indigo-950;
+    }
+    .print-payslip-total-amount {
+        @apply text-right py-4 px-4 font-bold text-indigo-950 text-lg;
+    }
+    .print-payslip-actions {
+        @apply text-center;
+    }
+
     /* Card styles */
     .card {
         @apply bg-white rounded-lg border border-slate-200/70;
