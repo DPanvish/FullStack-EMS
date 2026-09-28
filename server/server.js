@@ -5,6 +5,7 @@ import "dotenv/config";
 import connectDB from "./config/db.js";
 import authRouter from "./routes/auth.routes.js";
 import employeeRouter from "./routes/employee.routes.js";
+import profileRouter from "./routes/profile.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -17,6 +18,7 @@ app.use(multer().none());
 app.get("/", (req, res) => res.send("Server is running..."));
 app.use("/api/auth", authRouter);
 app.use("/api/employees", employeeRouter);
+app.use("/api/profile", profileRouter);
 
 await connectDB();
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
