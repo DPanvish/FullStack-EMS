@@ -8,7 +8,7 @@ export const getProfile = async(req, res) => {
     const employee = await Employee.findOne({userId: session.userId});
 
     if(!employee){
-      return res.jsin({firstName: "Admin", lastName: "", email: session.email});
+      return res.json({firstName: "Admin", lastName: "", email: session.email});
     }
 
     return res.json(employee);

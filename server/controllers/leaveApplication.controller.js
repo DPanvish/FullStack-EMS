@@ -13,7 +13,7 @@ export const createLeave = async(req, res) => {
     }
 
     if(employee.isDeleted){
-      return res.ststus(403).json({error: "Your account is deactivated. You cannot apply for leave."});
+      return res.status(403).json({error: "Your account is deactivated. You cannot apply for leave."});
     }
 
     const {type, startDate, endDate, reason} = req.body;
@@ -56,10 +56,12 @@ export const getLeaves = async(req, res) => {
     const session = req.session;
     const isAdmin = session.role === "ADMIN";
 
-    if(!isAdmin){
+    if(isAdmin){
       const status = req.query.status;
       const where = status ? {status} : {};
-      const leaves = (await LeaveApplication.find(where).populate("employeeId")).toSorted({createdAt: -1});
+      const leaves = await LeaveApplication.find(where)
+        .populate("employeeId")
+        .sort({createdAt: -1});
       
       const data = leaves.map((leave) => {
         const obj = leave.toObject();
@@ -80,7 +82,9 @@ export const getLeaves = async(req, res) => {
         return res.status(404).json({error: "Not found"});
       }
 
-      const leaves = (await LeaveApplication.find({employeeId: employee._id})).toSorted({createdAt: -1});
+      const leaves = await LeaveApplication.find({employeeId: employee._id})
+        .sort({createdAt: -1})
+        .lean();
 
       return res.json({data: leaves, employee: {...employee, id: employee._id.toString()}})
     }
