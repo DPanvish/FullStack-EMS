@@ -24,7 +24,7 @@ export const clockInOut = async(req, res) => {
     const now = new Date();
 
     if(!existing){
-      const isLate = now.getHours() >= 9 && now.getMinutes() > 0;
+      const isLate = now.getHours() > 9 || (now.getHours() === 9 && now.getMinutes() > 0);
       const attendance = await Attendance.create({
         employeeId: employee._id,
         date: today,
@@ -33,7 +33,7 @@ export const clockInOut = async(req, res) => {
       });
       return res.json({success: true, type: "CHECK_IN", data: attendance});
     }else if(!existing.checkOut){
-      const checkInTime = new Date(exixting.checkIn).getTime();
+      const checkInTime = new Date(existing.checkIn).getTime();
       const diffMs = now.getTime() - checkInTime;
       const diffHours = diffMs / (1000 * 60 * 60);
 
@@ -78,7 +78,10 @@ export const getAttendance = async(req, res) => {
     }
 
     const limit = parseInt(req.query.limit || 30);
-    const history = (await Attendance.find({employeeId: employee._id})).toSorted({date: -1}).limit(limit);
+    const history = await Attendance.find({employeeId: employee._id})
+      .sort({date: -1})
+      .limit(limit)
+      .lean();
 
     return res.json({date: history, employee: {isDeleted: employee.isDeleted}})
   }catch(error){

@@ -26,7 +26,7 @@ const payslipSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  newSalary: {
+  netSalary: {
     type: Number, 
     required: true
   }
