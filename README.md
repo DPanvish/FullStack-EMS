@@ -1,69 +1,163 @@
 # Employee Management System (EMS)
 
-A frontend Employee Management System for HR workflows. The app provides separate admin and employee login paths, dashboard views, employee records, attendance tracking, leave management, payslip generation, and organization settings.
+Employee Management System is a full-stack HR management project with a React client and an Express/MongoDB API. It supports separate admin and employee entry points, dashboard views, employee records, attendance, leave requests, payslips, profile settings, and email-backed workflow events.
 
 ## Features
 
-- Role-based entry points for Admin and Employee portals.
-- Dashboard overview for core HR metrics and activity.
-- Employee directory with add, edit, view, and delete flows.
-- Attendance check-in/check-out tracking with history and stats.
-- Leave request submission, review, approval, and rejection.
-- Payslip generation, listing, and printable payslip pages.
-- Settings screens for organization and user preferences.
+- Admin and employee login flows.
+- Dashboard summaries for HR and employee activity.
+- Employee directory with create, update, view, and delete operations.
+- Attendance check-in/check-out tracking.
+- Leave application submission and admin status updates.
+- Payslip creation, listing, detail lookup, and printable payslip views.
+- Profile and password management.
+- Inngest and Nodemailer integration for background/email workflows.
 
 ## Tech Stack
 
-- React 19 for the UI.
-- Vite 8 for local development and production builds.
-- Tailwind CSS 4 through the Vite plugin.
-- React Router DOM 7 for client-side routing.
-- Lucide React for icons.
-- React Hot Toast for notifications.
-- date-fns for date formatting and date utilities.
+### Client
 
-## Getting Started
+- React 19
+- Vite 8
+- Tailwind CSS 4 through `@tailwindcss/vite`
+- React Router / React Router DOM
+- Lucide React
+- React Hot Toast
+- date-fns
 
-### Prerequisites
+### Server
+
+- Node.js with Express 5
+- MongoDB with Mongoose
+- JSON Web Tokens for authentication
+- bcrypt for password hashing
+- multer for form parsing
+- Nodemailer with Brevo SMTP settings
+- Inngest for background functions
+
+## Project Structure
+
+```text
+ems/
+|-- README.md
+|-- setup.txt
+|-- client/
+|   |-- package.json
+|   |-- vite.config.js
+|   |-- index.html
+|   |-- public/
+|   `-- src/
+|       |-- App.jsx
+|       |-- main.jsx
+|       |-- index.css
+|       |-- assets/
+|       |-- components/
+|       `-- pages/
+`-- server/
+    |-- package.json
+    |-- server.js
+    |-- seed.js
+    |-- config/
+    |-- constants/
+    |-- controllers/
+    |-- inngest/
+    |-- middleware/
+    |-- models/
+    `-- routes/
+```
+
+## Prerequisites
 
 - Node.js 18 or newer.
-- npm, which is included with Node.js.
+- npm, included with Node.js.
+- A MongoDB connection string.
+- SMTP credentials if email delivery is required.
 
-### Installation
+## Environment Variables
+
+Create `server/.env` with values for your environment:
+
+```env
+PORT=4000
+MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>/<database>
+JWT_SECRET=<strong-random-secret>
+ADMIN_EMAIL=admin@example.com
+
+SMTP_USER=<smtp-user>
+SMTP_PASS=<smtp-password>
+SENDER_EMAIL=<sender-email>
+
+INNGEST_EVENT_KEY=<inngest-event-key>
+INNGEST_SIGNING_KEY=<inngest-signing-key>
+```
+
+Do not commit real secrets. The server code reads `JWT_SECRET`; make sure the variable name is spelled exactly that way.
+
+## Installation
+
+Install client dependencies:
 
 ```bash
-git clone <repository-url>
-cd ems/client
+cd client
 npm install
 ```
 
-### Development
+Install server dependencies:
 
 ```bash
+cd ../server
+npm install
+```
+
+## Running Locally
+
+Start the API server:
+
+```bash
+cd server
 npm run dev
 ```
 
-Vite starts the app at `http://localhost:5173/` by default. If that port is already in use, Vite prints the alternate local URL in the terminal.
+The API runs on `http://localhost:4000/` by default.
 
-### Build
-
-```bash
-npm run build
-```
-
-### Preview Production Build
+Start the client in another terminal:
 
 ```bash
-npm run preview
+cd client
+npm run dev
 ```
 
-### Lint
+Vite runs the client at `http://localhost:5173/` by default. If the port is already in use, Vite prints the alternate local URL.
+
+## Seeding the Admin User
+
+After configuring `server/.env`, create the first admin account:
 
 ```bash
-npm run lint
+cd server
+npm run seed
 ```
 
-## Routes
+The seed script uses `ADMIN_EMAIL` and creates a temporary password of `admin@123`. Change the password after first login.
+
+## Client Scripts
+
+```bash
+npm run dev      # Start the Vite development server
+npm run build    # Build the client for production
+npm run preview  # Preview the production build locally
+npm run lint     # Run ESLint
+```
+
+## Server Scripts
+
+```bash
+npm run dev    # Start the API with nodemon
+npm start      # Start the API with node
+npm run seed   # Create the initial admin user
+```
+
+## Client Routes
 
 - `/login` - choose Admin or Employee login.
 - `/login/admin` - Admin portal login.
@@ -73,31 +167,21 @@ npm run lint
 - `/attendance` - attendance tracking.
 - `/leave` - leave management.
 - `/payslips` - payslip management.
-- `/settings` - settings.
+- `/settings` - profile and settings.
 - `/print/payslips/:id` - printable payslip view.
 
-## Project Structure
+## API Routes
 
-```text
-ems/
-|-- README.md
-|-- setup.txt
-`-- client/
-    |-- package.json
-    |-- vite.config.js
-    |-- index.html
-    |-- public/
-    |   |-- favicon.svg
-    |   `-- icons.svg
-    `-- src/
-        |-- App.jsx
-        |-- main.jsx
-        |-- index.css
-        |-- assets/
-        |-- components/
-        `-- pages/
-```
+- `GET /` - server health message.
+- `/api/auth` - login, session, and password routes.
+- `/api/employees` - employee management routes.
+- `/api/profile` - profile read/update routes.
+- `/api/attendance` - attendance routes.
+- `/api/leave` - leave application routes.
+- `/api/payslips` - payslip routes.
+- `/api/dashboard` - dashboard data route.
+- `/api/inngest` - Inngest function endpoint.
 
 ## Notes
 
-This repository currently contains the frontend client. Data handling is implemented in the React application layer; add API configuration notes here if a backend service is connected later.
+The React client currently keeps sample HR data in the application layer while the Express API provides the backend routes and database models. Wire the client pages to the API when moving from mock data to live data.

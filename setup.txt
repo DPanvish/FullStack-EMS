@@ -1,67 +1,153 @@
-Setup Steps
+Setup Guide
 ===========
 
-1. Created the frontend app inside the `client` folder with the React Vite template.
+This project contains two apps:
 
-   Commands:
+- `client`: React + Vite frontend.
+- `server`: Express + MongoDB backend API.
 
-   ```bash
-   npm create vite@latest client -- --template react
-   cd client
-   npm install
-   ```
+Prerequisites
+=============
 
-2. Installed frontend UI, routing, styling, notification, icon, and date utility packages.
+- Node.js 18 or newer.
+- npm.
+- MongoDB connection string.
+- SMTP credentials if email notifications are required.
 
-   Command:
+Client Setup
+============
 
-   ```bash
-   npm install @tailwindcss/vite tailwindcss lucide-react react-hot-toast react-router-dom date-fns
-   ```
-
-3. Available npm scripts from `client/package.json`.
-
-   ```bash
-   npm run dev      # Start the Vite development server.
-   npm run build    # Create a production build.
-   npm run preview  # Preview the production build locally.
-   npm run lint     # Run ESLint against the client source.
-   ```
-
-Current Dependencies
-====================
-
-- `@tailwindcss/vite` (`^4.2.4`): Connects Tailwind CSS with Vite.
-- `date-fns` (`^4.4.0`): Provides date formatting and date utility helpers.
-- `lucide-react` (`^1.14.0`): Provides reusable React icon components.
-- `react` (`^19.2.5`): Core UI library.
-- `react-dom` (`^19.2.5`): Renders React into the browser DOM.
-- `react-hot-toast` (`^2.6.0`): Displays toast notifications.
-- `react-router-dom` (`^7.15.0`): Provides client-side routing.
-- `tailwindcss` (`^4.2.4`): Utility-first CSS framework.
-
-Current Development Dependencies
-================================
-
-- `@eslint/js` (`^10.0.1`): Recommended JavaScript linting rules.
-- `@types/react` (`^19.2.14`): React type definitions for tooling and editor support.
-- `@types/react-dom` (`^19.2.3`): React DOM type definitions for tooling and editor support.
-- `@vitejs/plugin-react` (`^6.0.1`): React support for Vite.
-- `eslint` (`^10.2.1`): JavaScript and React linting.
-- `eslint-plugin-react-hooks` (`^7.1.1`): Enforces the Rules of Hooks.
-- `eslint-plugin-react-refresh` (`^0.5.2`): Checks React Fast Refresh compatibility.
-- `globals` (`^17.5.0`): Browser and JavaScript globals for ESLint.
-- `vite` (`^8.0.10`): Frontend build tool and development server.
-
-Local Setup
-===========
-
-From a fresh clone:
+From the repository root:
 
 ```bash
-cd ems/client
+cd client
 npm install
 npm run dev
 ```
 
-The app runs at `http://localhost:5173/` by default. If port `5173` is unavailable, Vite prints the alternate URL.
+The client runs at `http://localhost:5173/` by default. If port `5173` is unavailable, Vite prints the alternate URL.
+
+Client Scripts
+==============
+
+```bash
+npm run dev      # Start the Vite development server.
+npm run build    # Create a production build.
+npm run preview  # Preview the production build locally.
+npm run lint     # Run ESLint against the client source.
+```
+
+Server Setup
+============
+
+From the repository root:
+
+```bash
+cd server
+npm install
+```
+
+Create `server/.env`:
+
+```env
+PORT=4000
+MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>/<database>
+JWT_SECRET=<strong-random-secret>
+ADMIN_EMAIL=admin@example.com
+
+SMTP_USER=<smtp-user>
+SMTP_PASS=<smtp-password>
+SENDER_EMAIL=<sender-email>
+
+INNGEST_EVENT_KEY=<inngest-event-key>
+INNGEST_SIGNING_KEY=<inngest-signing-key>
+```
+
+Keep real secret values out of committed files. The backend authentication code expects `JWT_SECRET`.
+
+Server Scripts
+==============
+
+```bash
+npm run dev    # Start the server with nodemon.
+npm start      # Start the server with node.
+npm run seed   # Create the initial admin user.
+```
+
+The API runs at `http://localhost:4000/` by default.
+
+Admin Seed
+==========
+
+After configuring `server/.env`, run:
+
+```bash
+cd server
+npm run seed
+```
+
+The seed script creates an admin user from `ADMIN_EMAIL` with the temporary password `admin@123`. Change this password after logging in.
+
+Current Client Dependencies
+===========================
+
+- `@tailwindcss/vite` (`^4.2.4`): Connects Tailwind CSS with Vite.
+- `date-fns` (`^4.4.0`): Date formatting and date utility helpers.
+- `lucide-react` (`^1.14.0`): Reusable React icon components.
+- `react` (`^19.2.5`): Core UI library.
+- `react-dom` (`^19.2.5`): Renders React into the browser DOM.
+- `react-hot-toast` (`^2.6.0`): Toast notifications.
+- `react-router` (`^8.4.0`): Routing package.
+- `react-router-dom` (`^7.15.0`): Browser routing helpers.
+- `tailwindcss` (`^4.2.4`): Utility-first CSS framework.
+
+Current Client Development Dependencies
+=======================================
+
+- `@eslint/js` (`^10.0.1`): Recommended JavaScript linting rules.
+- `@types/react` (`^19.2.14`): React type definitions.
+- `@types/react-dom` (`^19.2.3`): React DOM type definitions.
+- `@vitejs/plugin-react` (`^6.0.1`): React support for Vite.
+- `eslint` (`^10.2.1`): JavaScript and React linting.
+- `eslint-plugin-react-hooks` (`^7.1.1`): Rules of Hooks linting.
+- `eslint-plugin-react-refresh` (`^0.5.2`): React Fast Refresh checks.
+- `globals` (`^17.5.0`): Browser and JavaScript globals for ESLint.
+- `vite` (`^8.0.10`): Frontend build tool and development server.
+
+Current Server Dependencies
+===========================
+
+- `bcrypt` (`^6.0.0`): Password hashing.
+- `cors` (`^2.8.6`): Cross-origin request handling.
+- `dotenv` (`^18.0.1`): Environment variable loading.
+- `express` (`^5.2.1`): Backend HTTP framework.
+- `inngest` (`^4.21.1`): Background function/event handling.
+- `jsonwebtoken` (`^9.0.3`): JWT authentication.
+- `mongoose` (`^9.10.1`): MongoDB object modeling.
+- `multer` (`^2.4.0`): Form-data parsing.
+- `nodemailer` (`^10.0.15`): Email delivery.
+
+Current Server Development Dependencies
+=======================================
+
+- `nodemon` (`^3.1.14`): Restarts the API during development.
+
+Useful API Paths
+================
+
+- `GET /`: Server health message.
+- `/api/auth`: Login, session, and password routes.
+- `/api/employees`: Employee management routes.
+- `/api/profile`: Profile read/update routes.
+- `/api/attendance`: Attendance routes.
+- `/api/leave`: Leave request routes.
+- `/api/payslips`: Payslip routes.
+- `/api/dashboard`: Dashboard route.
+- `/api/inngest`: Inngest endpoint.
+
+Implementation Notes
+====================
+
+- The client currently uses sample data in `client/src/assets/assets.jsx`.
+- The server already includes API routes, controllers, models, middleware, and database connection code.
+- Connect the client pages to the API before using the app with live data.
