@@ -36,8 +36,14 @@ export const createEmployee = async(req, res) => {
   try{
     const {firstName, lastName, email, phone, position, department, basicSalary, allowances, deductions, joinDate, password, role, bio} = req.body;
 
-    if(!email || !password || !firstName || !lastName){
+    if(!email || !password || !firstName || !lastName || !phone || !position || !joinDate){
       return res.status(400).json({error: "Missing required fields"});
+    }
+
+    const parsedJoinDate = new Date(joinDate);
+
+    if(Number.isNaN(parsedJoinDate.getTime())){
+      return res.status(400).json({error: "Invalid join date"});
     }
 
     const hashed = await bcrypt.hash(password, 10);
@@ -58,7 +64,7 @@ export const createEmployee = async(req, res) => {
       basicSalary: Number(basicSalary) || 0,
       allowances: Number(allowances) || 0,
       deductions: Number(deductions) || 0,
-      joinDate: new Date(joinDate),
+      joinDate: parsedJoinDate,
       bio: bio || "",
     })
 
