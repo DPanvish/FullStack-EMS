@@ -1,30 +1,38 @@
 import { Loader2, Save, User } from "lucide-react";
 import { useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../api/api";
 
 const ProfileForm = ({initialData, onSuccess}) => {
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async(e) => {
-    e.preventDefault();
+  const updateProfileMutation = useMutation({
+    mutationFn: async (formData) => {
+      const res = await api.post("/profile", formData);
+      return res.data;
+    },
+    onSuccess: () => {
+      setMessage("Profile updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      onSuccess?.();
+    },
+    onError: (err) => {
+      setError(err.response?.data?.error || err.message);
+    },
+  });
 
-    setLoading(true);
+  const loading = updateProfileMutation.isPending;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
     setError("");
     setMessage("");
     const formData = new FormData(e.currentTarget);
-
-    try{
-      await api.post("/profile", formData);
-      setMessage("Profile updated successfully");
-      onSuccess?.();
-    }catch(error){
-      setError(error.response?.data?.error || error.message);
-    }finally{
-      setLoading(false);
-    }
+    updateProfileMutation.mutate(formData);
   }
+
   return (
     <form onSubmit={handleSubmit} className="settings-profile-card">
       <h2 className="settings-section-title">

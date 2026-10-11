@@ -4,25 +4,26 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"
 import api from "../../api/api";
 
+import { useQuery } from "@tanstack/react-query";
+
 const Sidebar = () => {
   const { pathname } = useLocation();
-  const [userName, setUserName] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   
   const {user, loading, logout} = useAuth();
 
-  useEffect(() => {
-    api
-      .get("/profile")
-      .then(({ data }) => {
-        if (data.firstName) {
-          setUserName(`${data.firstName} ${data.lastName || ""}`.trim());
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch profile in sidebar:", err);
-      });
-  }, []);
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const { data } = await api.get("/profile");
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const userName = profile?.firstName
+    ? `${profile.firstName} ${profile.lastName || ""}`.trim()
+    : "";
 
   useEffect(() => {
     setMobileOpen(false);

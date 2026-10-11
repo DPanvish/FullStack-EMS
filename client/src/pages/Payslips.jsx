@@ -1,40 +1,32 @@
-import { useCallback, useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query";
 import Loading from "../components/Loading"
 import PayslipList from "../components/payslip/PayslipList";
 import GeneratePayslipForm from "../components/payslip/GeneratePayslipForm";
 import { useAuth } from "../../context/AuthContext";
-import toast from "react-hot-toast";
 import api from "../../api/api";
 
 const Payslips = () => {
   const {user} = useAuth();
-  const [payslips, setPayslips] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
   const isAdmin = user?.role === "ADMIN";
 
-  const fetchPayslips = useCallback(async () => {
-    try{
+  const { data: payslips = [], isLoading: payslipsLoading } = useQuery({
+    queryKey: ["payslips"],
+    queryFn: async () => {
       const res = await api.get("/payslips");
-      setPayslips(res.data.data || []);
-    }catch(error){
-      toast.error(error?.response?.data?.error || error?.message);
-    }finally{
-      setLoading(false);
-    }
-  }, []);
+      return res.data?.data || [];
+    },
+  });
 
-  useEffect(() => {
-    fetchPayslips();
-  }, [fetchPayslips])
+  const { data: employees = [], isLoading: employeesLoading } = useQuery({
+    queryKey: ["employees", "active"],
+    queryFn: async () => {
+      const res = await api.get("/employees");
+      return (res.data || []).filter((e) => !e.isDeleted);
+    },
+    enabled: isAdmin,
+  });
 
-  useEffect(() => {
-    if(isAdmin){
-      api.get("/employees")
-        .then((res) => setEmployees(res.data.filter((e) => !e.isDeleted)))
-        .catch((error) => toast.error(error?.response?.data?.error || error?.message))
-    }
-  }, [isAdmin])
+  const loading = payslipsLoading || (isAdmin && employeesLoading);
 
   if(loading){
     return <Loading />
@@ -47,7 +39,7 @@ const Payslips = () => {
           <h1 className="page-title">Payslips</h1>
           <p className="page-subtitle">{isAdmin ? "Generate and manage employee payslips" : "Your payslip history"}</p>
         </div>
-        {isAdmin && <GeneratePayslipForm employees={employees} onSuccess={fetchPayslips} />}
+        {isAdmin && <GeneratePayslipForm employees={employees} />}
       </div>
       <PayslipList payslips={payslips} isAdmin={isAdmin} />
     </div>

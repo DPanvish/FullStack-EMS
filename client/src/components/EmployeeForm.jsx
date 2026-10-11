@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DEPARTMENTS } from "../assets/assets";
 import { Loader2Icon } from "lucide-react";
 import api from "../../api/api";
@@ -7,12 +7,32 @@ import toast from "react-hot-toast";
 
 const EmployeeForm = ({initialData, onSuccess, onCancel}) => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
   const isEditMode = !!initialData;
   
-  const handleSubmit = async(e) => {
+  const mutation = useMutation({
+    mutationFn: async (formData) => {
+      const id = initialData?.id || initialData?._id;
+      const url = isEditMode ? `/employees/${id}` : "/employees";
+      const method = isEditMode ? "put" : "post";
+      const res = await api[method](url, formData);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success(isEditMode ? "Employee updated successfully" : "Employee created successfully");
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      onSuccess ? onSuccess() : navigate("/employees");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || error.message);
+    },
+  });
+
+  const loading = mutation.isPending;
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
     const formData = new FormData(e.currentTarget);
 
     if(isEditMode){
@@ -22,16 +42,7 @@ const EmployeeForm = ({initialData, onSuccess, onCancel}) => {
       }
     }
 
-    try{
-      const url = isEditMode ? `/employees/${initialData.id}` : "/employees";
-      const method = isEditMode ? "put" : "post";
-      await api[method](url, formData);
-      onSuccess ? onSuccess() : navigate("/employees");
-    }catch(error){
-      toast.error(error.response?.data?.error || error.message);
-    }finally{
-      setLoading(false);
-    }
+    mutation.mutate(formData);
   }
 
   return (
