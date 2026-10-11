@@ -3,6 +3,7 @@ import { MenuIcon, UserIcon, XIcon, LayoutGridIcon, CalendarIcon, FileTextIcon, 
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"
 import api from "../../api/api";
+import Logo from "./Logo";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -51,15 +52,7 @@ const Sidebar = () => {
     <>
       <div className="px-5 pt-6 pb-5 sidebar-divider-bottom">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="sidebar-brand-mark">
-              <UserIcon className="sidebar-brand-icon" />
-            </div>
-            <div>
-              <p className="sidebar-title">Employee MS</p>
-              <p className="sidebar-subtitle">Management System</p>
-            </div>
-          </div>
+          <Logo />
 
           {/* Close button on mobile */}
           <button onClick={() => setMobileOpen(false)} className="sidebar-close">

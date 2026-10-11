@@ -1,187 +1,287 @@
-# Employee Management System (EMS)
+# QuickEMS — Enterprise Employee Management System
 
-Employee Management System is a full-stack HR management project with a React client and an Express/MongoDB API. It supports separate admin and employee entry points, dashboard views, employee records, attendance, leave requests, payslips, profile settings, and email-backed workflow events.
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Express](https://img.shields.io/badge/Express-5.x-000000?logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![TanStack Query](https://img.shields.io/badge/TanStack_Query-v5-FF4154?logo=reactquery&logoColor=white)](https://tanstack.com/query/latest)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Inngest](https://img.shields.io/badge/Inngest-Workflows-000000?logo=inngest&logoColor=white)](https://www.inngest.com/)
 
-## Features
+**QuickEMS** is an enterprise-grade full-stack human resource management platform designed for modern organizations. Built with React 19, Express 5, and MongoDB, it features role-based access control, server-side HTTP-Only cookie security, automated serverless workflow orchestration, and an asynchronous data architecture powered by TanStack Query.
 
-- Admin and employee login flows.
-- Dashboard summaries for HR and employee activity.
-- Employee directory with create, update, view, and delete operations.
-- Attendance check-in/check-out tracking.
-- Leave application submission and admin status updates.
-- Payslip creation, listing, detail lookup, and printable payslip views.
-- Profile and password management.
-- Inngest and Nodemailer integration for background/email workflows.
+---
 
-## Tech Stack
+## 📑 Table of Contents
+- [Key Features](#-key-features)
+- [Architecture & Tech Stack](#-architecture--tech-stack)
+- [Security & Engineering Hardening](#-security--engineering-hardening)
+- [Project Structure](#-project-structure)
+- [Quick Start & Installation](#-quick-start--installation)
+- [Environment Variables](#-environment-variables)
+- [API Reference](#-api-reference)
+- [Background Workflows (Inngest)](#-background-workflows-inngest)
+- [License](#-license)
 
-### Client
+---
 
-- React 19
-- Vite 8
-- Tailwind CSS 4 through `@tailwindcss/vite`
-- React Router / React Router DOM
-- Lucide React
-- React Hot Toast
-- date-fns
+## ✨ Key Features
 
-### Server
+### 👤 Role-Based Portals (Admin & Employee)
+- **Admin Portal**: Complete employee directory with CRUD operations, department filters, live payroll generation, leave approvals/rejections, and high-level company analytics.
+- **Employee Portal**: Daily clock-in/out tracking, live work hour calculation, leave request submissions, payslip downloads, and personal profile updates.
 
-- Node.js with Express 5
-- MongoDB with Mongoose
-- JSON Web Tokens for authentication
-- bcrypt for password hashing
-- multer for form parsing
-- Nodemailer with Brevo SMTP settings
-- Inngest for background functions
+### ⚡ TanStack Query Integration
+- Asynchronous client-state management across all pages.
+- Automatic background caching, query deduplication, and declarative loading/error states.
+- Unified cache invalidation across mutations (e.g. updating a profile instantly reflects across the Sidebar and Settings simultaneously).
 
-## Project Structure
+### ⏰ Attendance & Time Tracking
+- Real-time work shift tracking calculating full-day, three-quarter-day, half-day, and short-day hours.
+- Automated Inngest background event triggers that remind employees to clock out and mark auto-checkout after shift limits.
+- Daily 11:30 AM cron job scanning for absent employees and dispatching email notifications.
+
+### 📝 Leave Management
+- Multi-category leave requests (`SICK`, `CASUAL`, `ANNUAL`) with future-date validation.
+- Real-time status tracking (`PENDING`, `APPROVED`, `REJECTED`).
+- Automated 24-hour reminder email dispatch to admins for unattended leave applications.
+
+### 💵 Payroll & Digital Payslips
+- Instant monthly payslip generation with automatic salary/allowance/deduction autofill based on employee contracts.
+- Duplicate payslip prevention for identical billing cycles.
+- Dedicated print-optimized payslip layout for PDF generation and physical printing.
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+```
+   ┌─────────────────────────────────────────────────────────────┐
+   │                    QuickEMS Frontend                        │
+   │  React 19 • Vite 8 • Tailwind CSS 4 • TanStack Query v5     │
+   └───────────────▲─────────────────────────────┬───────────────┘
+                   │ Credentials: true (Cookies) │
+                   │ HTTP-Only Auth Token        │
+   ┌───────────────┴─────────────────────────────▼───────────────┐
+   │                    QuickEMS API Server                      │
+   │   Express 5 • Mongoose 9 • Cookie-Parser • Multer           │
+   └───────────────┬─────────────────────────────┬───────────────┘
+                   │                             │
+                   ▼                             ▼
+   ┌─────────────────────────────┐ ┌─────────────────────────────┐
+   │       MongoDB Atlas         │ │     Inngest Serverless      │
+   │  Employees, Users, Leaves,  │ │  Shift Monitors, Reminders, │
+   │    Attendance, Payslips     │ │       Daily Cron Jobs       │
+   └─────────────────────────────┘ └─────────────────────────────┘
+```
+
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React 19, Vite 8, TanStack Query v5, Tailwind CSS v4, Lucide Icons, Date-fns, React Hot Toast |
+| **Backend** | Node.js, Express 5, Cookie-Parser, Multer, Bcrypt, JsonWebToken |
+| **Database** | MongoDB Atlas with Mongoose 9 ODM |
+| **Workflows & Cron** | Inngest Cloud / Dev Server |
+| **Email Service** | Nodemailer with Brevo (SMTP Relay) |
+
+---
+
+## 🛡️ Security & Engineering Hardening
+
+1. **HTTP-Only & Secure Cookies**:
+   - Replaced vulnerable `localStorage` tokens with `httpOnly`, `SameSite: lax`/`none`, and `Secure` cookies to protect against Cross-Site Scripting (XSS) token exfiltration.
+2. **CORS Credentials Protection**:
+   - Configured origin matching with `credentials: true` preventing unauthorized cross-origin requests.
+3. **IDOR & Authorization Protection**:
+   - Explicit object-level access control on `GET /api/payslips/:id` ensuring employees can only inspect their own financial records.
+4. **Data Integrity & Rollback**:
+   - Sequential user and employee account creation is wrapped in automated rollback handlers to prevent orphaned records in MongoDB.
+   - Unique compound indexes preventing duplicate monthly payslips per employee.
+
+---
+
+## 📁 Project Structure
 
 ```text
 ems/
-|-- README.md
-|-- setup.txt
-|-- client/
-|   |-- package.json
-|   |-- vite.config.js
-|   |-- index.html
-|   |-- public/
-|   `-- src/
-|       |-- App.jsx
-|       |-- main.jsx
-|       |-- index.css
-|       |-- assets/
-|       |-- components/
-|       `-- pages/
-`-- server/
-    |-- package.json
-    |-- server.js
-    |-- seed.js
-    |-- config/
-    |-- constants/
-    |-- controllers/
-    |-- inngest/
-    |-- middleware/
-    |-- models/
-    `-- routes/
+├── client/                     # Frontend Application (React + Vite)
+│   ├── api/                    # Axios API client with credentials interceptors
+│   ├── context/                # Authentication context powered by TanStack Query
+│   ├── public/                 # Static assets (Favicon SVG)
+│   └── src/
+│       ├── assets/             # Department constants and presentation helpers
+│       ├── components/         # Modular UI components (Modals, Cards, Sidebar, Logo)
+│       ├── pages/              # Primary route views (Dashboard, Attendance, Leave, etc.)
+│       ├── App.jsx             # Route definitions and layout wrappers
+│       ├── index.css           # Custom theme tokens and Tailwind styling
+│       └── main.jsx            # QueryClientProvider & BrowserRouter mounting
+│
+├── server/                     # Backend Application (Express + Node)
+│   ├── config/                 # Database and Nodemailer transporter configuration
+│   ├── constants/              # System-wide enum values (Departments, Roles)
+│   ├── controllers/            # Controller business logic
+│   ├── inngest/                # Scheduled cron jobs and event-driven functions
+│   ├── middleware/             # Cookie token authentication and role guards
+│   ├── models/                 # Mongoose schemas (User, Employee, Attendance, etc.)
+│   ├── routes/                 # Express route definitions
+│   ├── seed.js                 # Initial admin account seeder
+│   └── server.js               # Application entry point
+│
+├── README.md                   # Repository documentation
+└── setup.txt                   # Quick installation reference
 ```
 
-## Prerequisites
+---
 
-- Node.js 18 or newer.
-- npm, included with Node.js.
-- A MongoDB connection string.
-- SMTP credentials if email delivery is required.
+## 🚀 Quick Start & Installation
 
-## Environment Variables
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18.0.0 or higher)
+- [npm](https://www.npmjs.com/) (v9.0.0 or higher)
+- MongoDB Connection URI (Local or MongoDB Atlas)
 
-Create `server/.env` with values for your environment:
+---
 
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/ems.git
+cd ems
+```
+
+---
+
+### 2. Backend Setup
+```bash
+cd server
+npm install
+```
+
+Create a `.env` file in `server/` (refer to `.env.example`):
 ```env
 PORT=4000
-MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>/<database>
-JWT_SECRET=<strong-random-secret>
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/ems
+JWT_SECRET=your_jwt_secret_key_here
 ADMIN_EMAIL=admin@example.com
+CLIENT_URL=http://localhost:5173
 
-SMTP_USER=<smtp-user>
-SMTP_PASS=<smtp-password>
-SENDER_EMAIL=<sender-email>
-
-INNGEST_EVENT_KEY=<inngest-event-key>
-INNGEST_SIGNING_KEY=<inngest-signing-key>
+# Optional: Inngest & Email
+INNGEST_EVENT_KEY=your_inngest_key
+INNGEST_SIGNING_KEY=your_signing_key
+SMTP_USER=your_smtp_user
+SMTP_PASS=your_smtp_pass
+SENDER_EMAIL=notifications@yourdomain.com
 ```
 
-Do not commit real secrets. The server code reads `JWT_SECRET`; make sure the variable name is spelled exactly that way.
-
-## Installation
-
-Install client dependencies:
-
+Seed the default administrator account:
 ```bash
-cd client
-npm install
-```
-
-Install server dependencies:
-
-```bash
-cd ../server
-npm install
-```
-
-## Running Locally
-
-Start the API server:
-
-```bash
-cd server
-npm run dev
-```
-
-The API runs on `http://localhost:4000/` by default.
-
-Start the client in another terminal:
-
-```bash
-cd client
-npm run dev
-```
-
-Vite runs the client at `http://localhost:5173/` by default. If the port is already in use, Vite prints the alternate local URL.
-
-## Seeding the Admin User
-
-After configuring `server/.env`, create the first admin account:
-
-```bash
-cd server
 npm run seed
 ```
+> Default Admin credentials: `admin@example.com` / `admin@123`
 
-The seed script uses `ADMIN_EMAIL` and creates a temporary password of `admin@123`. Change the password after first login.
-
-## Client Scripts
-
+Start the server:
 ```bash
-npm run dev      # Start the Vite development server
-npm run build    # Build the client for production
-npm run preview  # Preview the production build locally
-npm run lint     # Run ESLint
+npm run dev
 ```
 
-## Server Scripts
+---
 
+### 3. Frontend Setup
+In a new terminal:
 ```bash
-npm run dev    # Start the API with nodemon
-npm start      # Start the API with node
-npm run seed   # Create the initial admin user
+cd client
+npm install
 ```
 
-## Client Routes
+Create a `.env` file in `client/`:
+```env
+VITE_BASE_URL=http://localhost:4000
+```
 
-- `/login` - choose Admin or Employee login.
-- `/login/admin` - Admin portal login.
-- `/login/employee` - Employee portal login.
-- `/dashboard` - main dashboard.
-- `/employees` - employee management.
-- `/attendance` - attendance tracking.
-- `/leave` - leave management.
-- `/payslips` - payslip management.
-- `/settings` - profile and settings.
-- `/print/payslips/:id` - printable payslip view.
+Start the Vite development server:
+```bash
+npm run dev
+```
 
-## API Routes
+Visit **`http://localhost:5173`** in your browser.
 
-- `GET /` - server health message.
-- `/api/auth` - login, session, and password routes.
-- `/api/employees` - employee management routes.
-- `/api/profile` - profile read/update routes.
-- `/api/attendance` - attendance routes.
-- `/api/leave` - leave application routes.
-- `/api/payslips` - payslip routes.
-- `/api/dashboard` - dashboard data route.
-- `/api/inngest` - Inngest function endpoint.
+---
 
-## Notes
+## 🔑 Environment Variables
 
-The React client currently keeps sample HR data in the application layer while the Express API provides the backend routes and database models. Wire the client pages to the API when moving from mock data to live data.
+### Server (`server/.env`)
+| Variable | Description | Required |
+|---|---|:---:|
+| `PORT` | Port for the backend API (Default: `4000`) | No |
+| `MONGODB_URI` | MongoDB connection string | **Yes** |
+| `JWT_SECRET` | Secret key for signing JSON Web Tokens | **Yes** |
+| `ADMIN_EMAIL` | Default system administrator email | **Yes** |
+| `CLIENT_URL` | Allowed frontend origin for CORS | **Yes** |
+| `SMTP_USER` | SMTP username for Nodemailer | Optional |
+| `SMTP_PASS` | SMTP password for Nodemailer | Optional |
+| `SENDER_EMAIL` | Outgoing notification email address | Optional |
+| `INNGEST_EVENT_KEY` | Inngest event dispatch key | Optional |
+| `INNGEST_SIGNING_KEY`| Inngest webhook signature validation key | Optional |
+
+### Client (`client/.env`)
+| Variable | Description | Required |
+|---|---|:---:|
+| `VITE_BASE_URL` | Base endpoint URL of the backend API | **Yes** |
+
+---
+
+## 📡 API Reference
+
+### Authentication (`/api/auth`)
+- `POST /api/auth/login` — Authenticate user and assign HTTP-Only cookie.
+- `POST /api/auth/logout` — Clear session cookie.
+- `GET /api/auth/session` — Retrieve active user session.
+- `POST /api/auth/change-password` — Update user account password.
+
+### Employees (`/api/employees`)
+- `GET /api/employees` — List all employees (Admin only, supports `?department=`).
+- `POST /api/employees` — Create user and employee profile (Admin only).
+- `PUT /api/employees/:id` — Update employee details (Admin only).
+- `DELETE /api/employees/:id` — Soft-delete employee account (Admin only).
+
+### Attendance (`/api/attendance`)
+- `GET /api/attendance` — Fetch personal attendance history.
+- `POST /api/attendance` — Clock in or clock out for today.
+
+### Leaves (`/api/leave`)
+- `GET /api/leave` — Fetch leave records (Admin: all; Employee: own).
+- `POST /api/leave` — Submit a new leave request.
+- `PATCH /api/leave/:id` — Approve or reject a leave request (Admin only).
+
+### Payslips (`/api/payslips`)
+- `GET /api/payslips` — List payslips (Admin: all; Employee: own).
+- `POST /api/payslips` — Generate a monthly payslip (Admin only).
+- `GET /api/payslips/:id` — Detailed payslip view (Authorized employee or Admin).
+
+### Dashboard (`/api/dashboard`)
+- `GET /api/dashboard` — Fetch role-specific dashboard metrics and metrics summary.
+
+---
+
+## ⚡ Background Workflows (Inngest)
+
+The application utilizes [Inngest](https://www.inngest.com/) for durable, distributed event-driven workflows:
+
+1. **`employee/check-out`**:
+   - Triggers upon employee clock-in.
+   - Sleeps for 9 hours. If the user hasn't clocked out, sends an email alert.
+   - After 10 hours, automatically records check-out with status `LATE`.
+2. **`leave/pending`**:
+   - Triggers upon leave application submission.
+   - Sleeps for 24 hours. If still pending, sends an escalation reminder to the admin.
+3. **`attendance-reminder-cron`**:
+   - Cron scheduled every weekday at 11:30 AM IST (`TZ=Asia/Kolkata 10 11 * * *`).
+   - Identifies active employees who have not clocked in and are not on approved leave, sending reminder emails.
+
+To run Inngest locally with the Express server:
+```bash
+npx inngest-cli@latest dev -u http://localhost:4000/api/inngest
+```
+
+---
+
+## 📄 License
+This project is licensed under the [ISC License](LICENSE).

@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns"
 import Loading from "../components/Loading"
+import Logo from "../components/Logo"
 import api from "../../api/api";
 
 const PrintPayslip = () => {
@@ -26,9 +27,12 @@ const PrintPayslip = () => {
 
   return (
     <div className="print-payslip-page">
-      <div className="print-payslip-header">
-        <h1 className="print-payslip-title">PAYSLIP</h1>
-        <p className="print-payslip-period">{format(new Date(payslip.year, payslip.month - 1), "MMMM yyyy")}</p>
+      <div className="print-payslip-header flex items-center justify-between">
+        <Logo showText={true} title="QuickEMS" subtitle="Payroll Department" />
+        <div className="text-right">
+          <h1 className="print-payslip-title">PAYSLIP</h1>
+          <p className="print-payslip-period">{format(new Date(payslip.year, payslip.month - 1), "MMMM yyyy")}</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-6 mb-8">

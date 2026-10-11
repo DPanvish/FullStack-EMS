@@ -1,153 +1,181 @@
-Setup Guide
-===========
+================================================================================
+QuickEMS — Enterprise Employee Management System
+Professional Setup & Operations Guide
+================================================================================
 
-This project contains two apps:
+OVERVIEW
+--------
+QuickEMS is a full-stack human resource management and operational suite:
+- client: Modern React 19 + Vite 8 frontend styled with Tailwind CSS 4, featuring
+  TanStack Query v5 state management and HTTP-Only cookie security.
+- server: Express 5 + MongoDB backend API featuring JWT authentication,
+  cookie-parser session handling, Multer document uploads, and Inngest serverless
+  background workflow orchestration.
 
-- `client`: React + Vite frontend.
-- `server`: Express + MongoDB backend API.
 
-Prerequisites
-=============
+PREREQUISITES
+-------------
+Ensure the following tools are installed on your environment before starting:
+1. Node.js (v18.0.0 or higher recommended, LTS preferred)
+2. npm (v9.0.0 or higher) or yarn / pnpm
+3. MongoDB database connection URI (local instance or MongoDB Atlas cluster)
+4. (Optional) SMTP credentials (e.g. Brevo / Gmail) for live email dispatch
+5. (Optional) Inngest CLI for local background workflow testing
 
-- Node.js 18 or newer.
-- npm.
-- MongoDB connection string.
-- SMTP credentials if email notifications are required.
 
-Client Setup
-============
+SERVER SETUP & CONFIGURATION
+----------------------------
+1. Navigate to the server directory:
+   cd server
 
-From the repository root:
+2. Install backend dependencies:
+   npm install
 
-```bash
-cd client
-npm install
-npm run dev
-```
+3. Configure environment variables:
+   Copy the example template to create your `.env` file:
+   (Windows PowerShell):
+   Copy-Item .env.example .env
+   (Linux/macOS):
+   cp .env.example .env
 
-The client runs at `http://localhost:5173/` by default. If port `5173` is unavailable, Vite prints the alternate URL.
+   Populate `server/.env` with your credentials:
+   ----------------------------------------------------------------------
+   PORT=4000
+   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/ems
+   JWT_SECRET=super_secret_jwt_key_at_least_32_characters_long
+   ADMIN_EMAIL=admin@example.com
 
-Client Scripts
-==============
+   # SMTP Configuration (Optional for notifications)
+   SMTP_USER=your_smtp_user
+   SMTP_PASS=your_smtp_password
+   SENDER_EMAIL="QuickEMS Notifications <noreply@yourdomain.com>"
 
-```bash
-npm run dev      # Start the Vite development server.
-npm run build    # Create a production build.
-npm run preview  # Preview the production build locally.
-npm run lint     # Run ESLint against the client source.
-```
+   # Inngest Background Jobs (Optional for cloud, leave blank for local dev)
+   INNGEST_EVENT_KEY=
+   INNGEST_SIGNING_KEY=
+   ----------------------------------------------------------------------
 
-Server Setup
-============
+4. Seed the initial Super Admin account:
+   npm run seed
 
-From the repository root:
+   Default Generated Admin Credentials:
+   - Email:    admin@example.com (or value defined in ADMIN_EMAIL)
+   - Password: admin@123
+   * Note: Change this temporary password upon initial login via the Settings portal.
 
-```bash
-cd server
-npm install
-```
+5. Start the backend server:
+   npm run dev     # Starts server with Nodemon (auto-reload) on port 4000
+   # or
+   npm start       # Production startup
 
-Create `server/.env`:
 
-```env
-PORT=4000
-MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>/<database>
-JWT_SECRET=<strong-random-secret>
-ADMIN_EMAIL=admin@example.com
+CLIENT SETUP & CONFIGURATION
+----------------------------
+1. Navigate to the client directory:
+   cd ../client
+   # or from repository root:
+   cd client
 
-SMTP_USER=<smtp-user>
-SMTP_PASS=<smtp-password>
-SENDER_EMAIL=<sender-email>
+2. Install frontend dependencies:
+   npm install
 
-INNGEST_EVENT_KEY=<inngest-event-key>
-INNGEST_SIGNING_KEY=<inngest-signing-key>
-```
+3. Configure environment variables:
+   Copy the example template to create your `.env` file:
+   (Windows PowerShell):
+   Copy-Item .env.example .env
+   (Linux/macOS):
+   cp .env.example .env
 
-Keep real secret values out of committed files. The backend authentication code expects `JWT_SECRET`.
+   Ensure `client/.env` points to your backend API:
+   ----------------------------------------------------------------------
+   VITE_BASE_URL=http://localhost:4000
+   ----------------------------------------------------------------------
 
-Server Scripts
-==============
+4. Start the frontend development server:
+   npm run dev
 
-```bash
-npm run dev    # Start the server with nodemon.
-npm start      # Start the server with node.
-npm run seed   # Create the initial admin user.
-```
+   The application will run locally at:
+   http://localhost:5173/
 
-The API runs at `http://localhost:4000/` by default.
 
-Admin Seed
-==========
+INNGEST BACKGROUND WORKFLOWS (LOCAL DEV)
+----------------------------------------
+QuickEMS employs Inngest for scheduled shift auto-checkouts, clock-out alerts,
+and automated morning absent notifications.
 
-After configuring `server/.env`, run:
+To execute background functions locally:
+1. Ensure your backend server is running on port 4000.
+2. In a separate terminal window, launch the Inngest local dev server:
+   npx inngest-cli@latest dev -u http://localhost:4000/api/inngest
+3. Open http://localhost:8288 to access the local Inngest function dashboard,
+   inspect event triggers, and replay background steps.
 
-```bash
-cd server
-npm run seed
-```
 
-The seed script creates an admin user from `ADMIN_EMAIL` with the temporary password `admin@123`. Change this password after logging in.
+CLIENT NPM SCRIPTS
+------------------
+- npm run dev      : Launches the Vite local dev server with Hot Module Replacement (HMR).
+- npm run build    : Generates an optimized production bundle in the `dist` folder.
+- npm run preview  : Locally serves the production build for testing before deployment.
+- npm run lint     : Executes ESLint against client source code for quality assurance.
 
-Current Client Dependencies
-===========================
 
-- `@tailwindcss/vite` (`^4.2.4`): Connects Tailwind CSS with Vite.
-- `date-fns` (`^4.4.0`): Date formatting and date utility helpers.
-- `lucide-react` (`^1.14.0`): Reusable React icon components.
-- `react` (`^19.2.5`): Core UI library.
-- `react-dom` (`^19.2.5`): Renders React into the browser DOM.
-- `react-hot-toast` (`^2.6.0`): Toast notifications.
-- `react-router` (`^8.4.0`): Routing package.
-- `react-router-dom` (`^7.15.0`): Browser routing helpers.
-- `tailwindcss` (`^4.2.4`): Utility-first CSS framework.
+SERVER NPM SCRIPTS
+------------------
+- npm run dev      : Launches the Express API with Nodemon watching for file changes.
+- npm start        : Runs the production server via Node.js runtime.
+- npm run seed     : Provisions the primary organization administrator in MongoDB.
 
-Current Client Development Dependencies
-=======================================
 
-- `@eslint/js` (`^10.0.1`): Recommended JavaScript linting rules.
-- `@types/react` (`^19.2.14`): React type definitions.
-- `@types/react-dom` (`^19.2.3`): React DOM type definitions.
-- `@vitejs/plugin-react` (`^6.0.1`): React support for Vite.
-- `eslint` (`^10.2.1`): JavaScript and React linting.
-- `eslint-plugin-react-hooks` (`^7.1.1`): Rules of Hooks linting.
-- `eslint-plugin-react-refresh` (`^0.5.2`): React Fast Refresh checks.
-- `globals` (`^17.5.0`): Browser and JavaScript globals for ESLint.
-- `vite` (`^8.0.10`): Frontend build tool and development server.
+PRODUCTION DEPENDENCY MANIFEST
+------------------------------
+Frontend (`client/package.json`):
+- react (^19.2.5)                : Core UI library.
+- react-dom (^19.2.5)            : DOM rendering layer.
+- @tanstack/react-query (^5.104) : Asynchronous server state caching, deduping & mutation sync.
+- axios (^1.20.0)                : HTTP client configured with credentials for cookie sessions.
+- tailwindcss (^4.2.4)           : Utility-first styling engine.
+- @tailwindcss/vite (^4.2.4)     : High-performance Vite CSS integration.
+- react-router-dom (^7.15.0)     : Client-side routing and layout rendering.
+- lucide-react (^1.14.0)         : Luxury geometric vector iconography.
+- react-hot-toast (^2.6.0)       : Toast feedback notifications.
+- date-fns (^4.4.0)              : Modern date calculation and formatting utilities.
 
-Current Server Dependencies
-===========================
+Backend (`server/package.json`):
+- express (^5.2.1)               : Next-gen HTTP framework.
+- mongoose (^9.10.1)             : MongoDB document modeling and transaction safety.
+- cookie-parser (^1.4.7)         : Parses HTTP-Only authorization cookies securely.
+- jsonwebtoken (^9.0.3)          : JWT generation and verification.
+- bcrypt (^6.0.0)                : Salted password hashing.
+- cors (^2.8.6)                  : Cross-origin resource sharing with credentials support.
+- multer (^2.4.0)                : Multi-part form-data & document upload parsing.
+- nodemailer (^10.0.15)          : Transactional email transport.
+- inngest (^4.21.1)              : Event-driven background jobs & cron workflow engine.
+- dotenv (^18.0.1)               : Runtime environment configuration loader.
 
-- `bcrypt` (`^6.0.0`): Password hashing.
-- `cors` (`^2.8.6`): Cross-origin request handling.
-- `dotenv` (`^18.0.1`): Environment variable loading.
-- `express` (`^5.2.1`): Backend HTTP framework.
-- `inngest` (`^4.21.1`): Background function/event handling.
-- `jsonwebtoken` (`^9.0.3`): JWT authentication.
-- `mongoose` (`^9.10.1`): MongoDB object modeling.
-- `multer` (`^2.4.0`): Form-data parsing.
-- `nodemailer` (`^10.0.15`): Email delivery.
 
-Current Server Development Dependencies
-=======================================
+KEY API ENDPOINTS
+-----------------
+- GET  /                         : Health check endpoint.
+- POST /api/auth/login           : User authentication (sets HTTP-Only cookie).
+- POST /api/auth/logout          : Terminates session (clears cookie).
+- GET  /api/auth/session         : Validates active session and returns authenticated user.
+- GET  /api/dashboard            : Aggregated organizational stats & metrics.
+- /api/employees                 : Employee CRUD directory & user creation.
+- /api/profile                   : Personal employee profile viewing & edits.
+- /api/attendance                : Real-time clock-in/out & shift history tracking.
+- /api/leave                     : Leave application, review, and status tracking.
+- /api/payslips                  : Automated monthly payroll calculation & history.
+- /api/inngest                   : Inngest serverless endpoint for automated background jobs.
 
-- `nodemon` (`^3.1.14`): Restarts the API during development.
 
-Useful API Paths
-================
-
-- `GET /`: Server health message.
-- `/api/auth`: Login, session, and password routes.
-- `/api/employees`: Employee management routes.
-- `/api/profile`: Profile read/update routes.
-- `/api/attendance`: Attendance routes.
-- `/api/leave`: Leave request routes.
-- `/api/payslips`: Payslip routes.
-- `/api/dashboard`: Dashboard route.
-- `/api/inngest`: Inngest endpoint.
-
-Implementation Notes
-====================
-
-- The client currently uses sample data in `client/src/assets/assets.jsx`.
-- The server already includes API routes, controllers, models, middleware, and database connection code.
-- Connect the client pages to the API before using the app with live data.
+VERIFYING THE INSTALLATION
+--------------------------
+1. Confirm backend is operational by visiting:
+   http://localhost:4000/ -> Expected: "Server is working"
+2. Confirm frontend is running at:
+   http://localhost:5173/
+3. Sign in as Super Admin (`admin@example.com` / `admin@123`).
+4. Create an employee under the Employees portal.
+5. In an incognito window, sign in using the new employee credentials to test
+   the Employee Portal (Attendance clock-in, leave application, profile view).
+================================================================================
