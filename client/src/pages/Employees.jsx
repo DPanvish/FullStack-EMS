@@ -12,7 +12,7 @@ const Employees = () => {
   const [editEmployee, setEditEmployee] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const { data: employees = [], isLoading: loading } = useQuery({
+  const { data: employees = [], isLoading: loading, refetch } = useQuery({
     queryKey: ["employees", { department: selectedDept }],
     queryFn: async () => {
       const url = selectedDept ? `/employees?department=${selectedDept}` : "/employees";
@@ -66,7 +66,14 @@ const Employees = () => {
             {filtered.length === 0 ? (
               <p className="employee-empty">No employees found</p>
             ) : (
-              filtered.map((emp) => <EmployeeCard key={emp.id} employee={emp} onDelete={fetchEmployees} onEdit={(e) => setEditEmployee(e)} />)
+              filtered.map((emp) => (
+                <EmployeeCard 
+                  key={emp.id || emp._id} 
+                  employee={emp} 
+                  onDelete={refetch} 
+                  onEdit={(e) => setEditEmployee(e)} 
+                />
+              ))
             )}
           </div>
         )}
