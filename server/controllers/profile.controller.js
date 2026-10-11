@@ -25,6 +25,9 @@ export const updateProfile = async(req, res) => {
     const employee = await Employee.findOne({userId: session.userId});
 
     if(!employee){
+      if(session.role === "ADMIN"){
+        return res.json({success: true, message: "Admin profile updated"});
+      }
       return res.status(404).json({error: "Employee not found"});
     }
 

@@ -2,21 +2,24 @@ import jwt from "jsonwebtoken";
 
 export const protect = (req, res, next) => {
   try{
-      const authHeader = req.headers.authorization;
+    const cookieToken = req.cookies?.token;
+    const authHeader = req.headers.authorization;
+    const headerToken = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
 
-      if(!authHeader || !authHeader.startsWith("Bearer ")){
-        return res.status(401).json({error: "Unauthorized"});
-      }
+    const token = cookieToken || headerToken;
 
-      const token = authHeader.split(" ")[1];
-      const session = jwt.verify(token, process.env.JWT_SECRET);
+    if(!token){
+      return res.status(401).json({error: "Unauthorized"});
+    }
 
-      if(!session){
-        return res.status(401).json({error: "Unauthorized"});
-      }
+    const session = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.session = session;
-      next();
+    if(!session){
+      return res.status(401).json({error: "Unauthorized"});
+    }
+
+    req.session = session;
+    next();
   }catch(error){
     return res.status(401).json({error: "Unauthorized"});
   }
