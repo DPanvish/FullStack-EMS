@@ -2,6 +2,15 @@ import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const isProduction = process.env.NODE_ENV === "production";
+
+export const getCookieOptions = () => ({
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+});
+
 // Login for employee and admin
 // POST /api/auth/login
 export const login = async(req, res) => {
@@ -40,6 +49,8 @@ export const login = async(req, res) => {
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: "7d"});
 
+    res.cookie("token", token, getCookieOptions());
+
     return res.json({user: payload, token});
   }catch(error){
     console.error("Login error:", error);
@@ -47,6 +58,16 @@ export const login = async(req, res) => {
   }
 }
 
+// Logout
+// POST /api/auth/logout
+export const logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+  });
+  return res.json({success: true, message: "Logged out successfully"});
+}
 
 // Get session for employee and admin
 // GET /api/auth/session
@@ -54,7 +75,6 @@ export const session = (req, res) => {
   const session = req.session;
   return res.json({user: session});
 }
-
 
 // Change password for employee and admin
 // POST /api/auth/change-password

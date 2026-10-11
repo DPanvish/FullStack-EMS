@@ -2,8 +2,13 @@ import { AlertCircleIcon, CalendarIcon, ClockIcon } from "lucide-react";
 
 
 const AttendanceStats = ({history}) => {
-  const totalPresent = history.filter((h) => h.status === "PRESENT" | h.status === "LATE").length;
+  const totalPresent = history.filter((h) => h.status === "PRESENT" || h.status === "LATE").length;
   const totalLate = history.filter((h) => h.status === "LATE").length;
+
+  const recordsWithHours = history.filter((h) => h.workingHours != null && h.workingHours > 0);
+  const avgHours = recordsWithHours.length > 0
+    ? `${(recordsWithHours.reduce((acc, h) => acc + h.workingHours, 0) / recordsWithHours.length).toFixed(1)} Hrs`
+    : "—";
 
   const stats = [
     {
@@ -18,7 +23,7 @@ const AttendanceStats = ({history}) => {
     },
     {
       label: "Avg. Work Hrs",
-      value: "8.5 Hrs",
+      value: avgHours,
       icon: ClockIcon
     }
   ]

@@ -1,35 +1,69 @@
 import { Loader2, Plus, X } from "lucide-react";
 import { useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../../api/api";
 import toast from "react-hot-toast";
 
-
 const GeneratePayslipForm = ({employees, onSuccess}) => {
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [selectedEmpId, setSelectedEmpId] = useState("");
+  const [basicSalary, setBasicSalary] = useState("");
+  const [allowances, setAllowances] = useState("");
+  const [deductions, setDeductions] = useState("");
 
-  const handleSubmit = async(e) => {
+  const handleOpen = () => {
+    const first = employees[0];
+    if(first){
+      setSelectedEmpId(first.id || first._id);
+      setBasicSalary(first.basicSalary ?? "");
+      setAllowances(first.allowances ?? 0);
+      setDeductions(first.deductions ?? 0);
+    }
+    setIsOpen(true);
+  }
+
+  const handleEmployeeChange = (e) => {
+    const empId = e.target.value;
+    setSelectedEmpId(empId);
+    const emp = employees.find((x) => (x.id || x._id) === empId);
+    if(emp){
+      setBasicSalary(emp.basicSalary ?? "");
+      setAllowances(emp.allowances ?? 0);
+      setDeductions(emp.deductions ?? 0);
+    }
+  }
+
+  const generateMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await api.post("/payslips", data);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Payslip generated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["payslips"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      setIsOpen(false);
+      onSuccess?.();
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || error?.message);
+    },
+  });
+
+  const loading = generateMutation.isPending;
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
-
-    try{
-      await api.post("/payslips", data);
-      setIsOpen(false);
-      onSuccess();
-    }catch(error){
-      toast.error(error.response?.data?.error || error?.message);
-    }finally{
-      setLoading(false);
-    }
+    generateMutation.mutate(data);
   }
 
   if(!isOpen){
     return(
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpen}
         className="btn-primary flex items-center gap-2"
       >
         <Plus className="w-4 h-4" /> Generate Payslip
@@ -51,9 +85,14 @@ const GeneratePayslipForm = ({employees, onSuccess}) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="payslip-form-label">Employee</label>
-            <select name="employeeId" required>
+            <select 
+              name="employeeId" 
+              required 
+              value={selectedEmpId} 
+              onChange={handleEmployeeChange}
+            >
               {employees.map((e) => (
-                <option key={e.id} value={e.id}>
+                <option key={e.id || e._id} value={e.id || e._id}>
                   {e.firstName} {e.lastName} ({e.position})
                 </option>
               ))}
@@ -63,7 +102,7 @@ const GeneratePayslipForm = ({employees, onSuccess}) => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="payslip-form-label">Month</label>
-              <select name="month">
+              <select name="month" defaultValue={new Date().getMonth() + 1}>
                 {Array.from({length: 12}, (_, i) => i + 1).map((m) => (
                   <option key={m} value={m}>
                     {m}
@@ -79,17 +118,34 @@ const GeneratePayslipForm = ({employees, onSuccess}) => {
 
           <div>
             <label className="payslip-form-label">Basic Salary</label>
-            <input type="number" name="basicSalary" required placeholder="5000" />
+            <input 
+              type="number" 
+              name="basicSalary" 
+              required 
+              placeholder="5000" 
+              value={basicSalary}
+              onChange={(e) => setBasicSalary(e.target.value)}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="payslip-form-label">Allowances</label>
-              <input type="number" name="allowances" defaultValue="0" />
+              <input 
+                type="number" 
+                name="allowances" 
+                value={allowances}
+                onChange={(e) => setAllowances(e.target.value)}
+              />
             </div>
             <div>
               <label className="payslip-form-label">Deductions</label>
-              <input type="number" name="deductions" defaultValue="0" />
+              <input 
+                type="number" 
+                name="deductions" 
+                value={deductions}
+                onChange={(e) => setDeductions(e.target.value)}
+              />
             </div>
           </div>
 

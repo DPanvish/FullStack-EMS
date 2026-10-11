@@ -1,7 +1,6 @@
 import Payslip from "../models/Payslip.js";
 import Employee from "../models/Employee.js";
 
-
 // Create payslip
 // POST /api/payslips
 export const createPayslip = async(req, res) => {
@@ -10,6 +9,16 @@ export const createPayslip = async(req, res) => {
 
     if(!employeeId || !month || !year || !basicSalary){
       return res.status(400).json({error: "Missing fields"});
+    }
+
+    const existing = await Payslip.findOne({
+      employeeId,
+      month: Number(month),
+      year: Number(year),
+    });
+
+    if(existing){
+      return res.status(400).json({error: "Payslip already generated for this month and year"});
     }
 
     const netSalary = Number(basicSalary) + Number(allowances || 0) - Number(deductions || 0);
@@ -29,7 +38,6 @@ export const createPayslip = async(req, res) => {
     return res.status(500).json({error: "Failed"});
   }
 }
-
 
 // Get payslips
 // GET /api/payslips
@@ -73,15 +81,19 @@ export const getPayslips = async(req, res) => {
   }
 }
 
-
 // Get payslip by ID
 // GET /api/payslips/:id
 export const getPayslipById = async(req, res) => {
   try{
+    const session = req.session;
     const payslip = await Payslip.findById(req.params.id).populate("employeeId").lean();
 
     if(!payslip){
       return res.status(404).json({error: "Not found"});
+    }
+
+    if(session.role !== "ADMIN" && payslip.employeeId?.userId?.toString() !== session.userId){
+      return res.status(403).json({error: "Unauthorized to view this payslip"});
     }
 
     const result = {

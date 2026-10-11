@@ -1,34 +1,45 @@
 import { Loader2Icon, LockIcon, X } from "lucide-react";
 import { useState } from "react"
+import { useMutation } from "@tanstack/react-query";
 import api from "../../api/api";
 
-
 const ChangePasswordModal = ({open, onClose}) => {
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({type: "", text: ""});
   
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage({type: "", text: ""});
-    const formData = new FormData(e.currentTarget);
-    const currentPassword = formData.get("currentPassword");
-    const newPassword = formData.get("newPassword");
-
-    try{
-      const {data} = await api.post("/auth/change-password", {currentPassword, newPassword});
-
+  const changePasswordMutation = useMutation({
+    mutationFn: async ({ currentPassword, newPassword }) => {
+      const { data } = await api.post("/auth/change-password", { currentPassword, newPassword });
       if(!data.success){
         throw new Error(data.error || "Failed");
       }
-      
-      setMessage({type: "success", text: "Password updated successfully"});
-      e.target.reset();
-    }catch(error){
-      setMessage({type: "error", text: error.message});
-    }finally{
-      setLoading(false);
-    }
+      return data;
+    },
+    onSuccess: () => {
+      setMessage({ type: "success", text: "Password updated successfully" });
+    },
+    onError: (error) => {
+      setMessage({ type: "error", text: error.response?.data?.error || error.message });
+    },
+  });
+
+  const loading = changePasswordMutation.isPending;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setMessage({type: "", text: ""});
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const currentPassword = formData.get("currentPassword");
+    const newPassword = formData.get("newPassword");
+
+    changePasswordMutation.mutate(
+      { currentPassword, newPassword },
+      {
+        onSuccess: () => {
+          form.reset();
+        },
+      }
+    );
   }
 
   if(!open){
@@ -59,18 +70,29 @@ const ChangePasswordModal = ({open, onClose}) => {
 
           <div>
             <label className="settings-form-label">Current Password</label>
-            <input type="password" name="currentPassword" required/>
+            <input type="password" name="currentPassword" required placeholder="••••••••" />
           </div>
 
           <div>
             <label className="settings-form-label">New Password</label>
-            <input type="password" name="newPassword" required />
+            <input type="password" name="newPassword" required placeholder="••••••••" />
           </div>
 
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="btn-secondary flex-1">Cancel</button>
-            <button type="submit" disabled={loading} className="btn-primary flex-1 flex justify-center items-center gap-2">
-              {loading && <Loader2Icon className="w-4 h-4 animate-spin" />}
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              onClick={onClose}
+              type="button"
+              className="btn-secondary"
+            >
+              Cancel
+            </button>
+
+            <button
+              disabled={loading}
+              type="submit"
+              className="btn-primary flex items-center"
+            >
+              {loading && <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />}
               Update Password
             </button>
           </div>

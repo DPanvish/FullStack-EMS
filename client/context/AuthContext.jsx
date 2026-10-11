@@ -1,55 +1,67 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../api/api";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({children}){
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const refreshSession = async() => {
-    const storedToken = localStorage.getItem("token");
+  const {
+    data: sessionUser,
+    isLoading: loading,
+    refetch: refreshSession
+  } = useQuery({
+    queryKey: ["auth", "session"],
+    queryFn: async () => {
+      try {
+        const { data } = await api.get("/auth/session");
+        return data?.user || null;
+      } catch (error) {
+        return null;
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-    if(!storedToken){
-      setUser(null);
-      setToken(null);
-      setLoading(false);
-      return;
+  const user = sessionUser ?? null;
+
+  const loginMutation = useMutation({
+    mutationFn: async ({ email, password, role_type }) => {
+      const { data } = await api.post("/auth/login", { email, password, role_type });
+      return data.user;
+    },
+    onSuccess: (newUser) => {
+      queryClient.setQueryData(["auth", "session"], newUser);
+      queryClient.invalidateQueries();
+    },
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await api.post("/auth/logout");
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(["auth", "session"], null);
+      queryClient.clear();
+    },
+  });
+
+  const login = async (email, password, role_type) => {
+    return await loginMutation.mutateAsync({ email, password, role_type });
+  };
+
+  const logout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+    } catch (e) {
+      console.error(e);
+      queryClient.setQueryData(["auth", "session"], null);
+      queryClient.clear();
     }
+  };
 
-    try{
-      const { data } = await api.get("/auth/session");
-      setUser(data.user);
-    }catch(error){
-      localStorage.removeItem("token");
-      setUser(null);
-      setToken(null);
-    }finally{
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    refreshSession();
-  }, []);
-
-  const login = async(email, password, role_type) => {
-    const {data} = await api.post("/auth/login", {email, password, role_type});
-
-    localStorage.setItem("token", data.token);
-    setToken(data.token);
-    setUser(data.user);
-    return data.user;
-  }
-
-  const logout = async() => {
-    localStorage.removeItem("token");
-    setToken(null);
-    setUser(null);
-  }
-
-  const value = {user, token, loading, login, logout, refreshSession};
+  const value = { user, token: null, loading, login, logout, refreshSession };
 
   return <AuthContext.Provider value={value}>
     {children}
