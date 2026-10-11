@@ -1,42 +1,31 @@
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query";
 import { PalmtreeIcon, PlusIcon, ThermometerIcon, UmbrellaIcon } from "lucide-react";
 import Loading from "../components/Loading";
 import LeaveHistory from "../components/leave/LeaveHistory";
 import ApplyLeaveModal from "../components/leave/ApplyLeaveModal";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/api";
-import toast from "react-hot-toast";
 
 const Leave = () => {
   const {user} = useAuth();
-  const [leaves, setLeaves] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [isDeleted, setIsDeleted] = useState(false);
   const isAdmin = user?.role === "ADMIN";
 
-  const fetchLeaves = useCallback(async() => {
-    try{
+  const { data: leaveResponse, isLoading: loading } = useQuery({
+    queryKey: ["leaves"],
+    queryFn: async () => {
       const res = await api.get("/leave");
-      setLeaves(res.data.data || []);
-
-      if(res.data.employee?.isDeleted){
-        setIsDeleted(true);
-      }
-    }catch(error){
-      toast.error(error?.response?.data?.error || error.message);
-    }finally{
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchLeaves();
-  }, [fetchLeaves]);
+      return res.data;
+    },
+  });
 
   if(loading){
     return <Loading />
   }
+
+  const leaves = leaveResponse?.data || [];
+  const isDeleted = !!leaveResponse?.employee?.isDeleted;
 
   const approvedLeaves = leaves.filter((l) => l.status === "APPROVED");
   const sickCount = approvedLeaves.filter((l) => l.type === "SICK").length;
@@ -65,16 +54,19 @@ const Leave = () => {
     <div className="animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="page-title">Leave Management</h1>
-          <p className="page-subtitle">{isAdmin ? "Manage leave applications" : "Your leave history and requests"}</p>
+          <h1 className="page-title">Leaves</h1>
+          <p className="page-subtitle">
+            {isAdmin ? "Review and manage employee leave applications" : "Track and apply for your leaves"}
+          </p>
         </div>
 
-        {!isAdmin && !isDeleted && (
+        {!isAdmin && (
           <button 
+            disabled={isDeleted}
             onClick={() => setShowModal(true)}
-            className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center"
+            className="btn-primary flex items-center gap-2"
           >
-            <PlusIcon className="w-4 h-4" /> Apply for Leave
+            <PlusIcon className="w-4 h-4" /> Apply Leave
           </button>
         )}
       </div>
@@ -98,8 +90,8 @@ const Leave = () => {
         </div>
       )}
 
-      <LeaveHistory leaves={leaves} isAdmin={isAdmin} onUpdate={fetchLeaves} />
-      <ApplyLeaveModal open={showModal} onClose={() => setShowModal(false)} onSuccess={fetchLeaves} />
+      <LeaveHistory leaves={leaves} isAdmin={isAdmin} />
+      <ApplyLeaveModal open={showModal} onClose={() => setShowModal(false)} />
     </div>
   )
 }

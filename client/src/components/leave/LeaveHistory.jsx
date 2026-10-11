@@ -1,23 +1,33 @@
 import { format } from 'date-fns';
 import { Check, Loader2, X } from 'lucide-react';
-import { useState } from 'react'
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from '../../../api/api';
 import toast from 'react-hot-toast';
 
 const LeaveHistory = ({leaves, isAdmin, onUpdate}) => {
-  const [processing, setProcessing] = useState(null);
+  const queryClient = useQueryClient();
 
-  const handleStatusUpdate = async(id, status) => {
-    setProcessing(id);
-    try{
-      await api.patch(`/leave/${id}`, {status});
-      onUpdate();
-    }catch(error){
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }) => {
+      const res = await api.patch(`/leave/${id}`, { status });
+      return res.data;
+    },
+    onSuccess: (_, { status }) => {
+      toast.success(`Leave request ${status.toLowerCase()} successfully`);
+      queryClient.invalidateQueries({ queryKey: ["leaves"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      onUpdate?.();
+    },
+    onError: (error) => {
       toast.error(error?.response?.data?.error || error.message);
-    }finally{
-      setProcessing(null);
-    }
+    },
+  });
+
+  const handleStatusUpdate = (id, status) => {
+    updateStatusMutation.mutate({ id, status });
   }
+
+  const isProcessingId = (id) => updateStatusMutation.isPending && updateStatusMutation.variables?.id === id;
 
   return (
     <div className="leave-history-card">
@@ -40,9 +50,11 @@ const LeaveHistory = ({leaves, isAdmin, onUpdate}) => {
               </tr>
             ) : (
               leaves.map((leave) => {
+                const leaveId = leave._id || leave.id;
+                const processing = isProcessingId(leaveId);
 
                 return(
-                  <tr key={leave._id || leave.id}>
+                  <tr key={leaveId}>
                     {isAdmin && (
                       <td className="leave-employee-cell">
                         {leave.employee?.firstName} {leave.employee?.lastName}
@@ -72,19 +84,27 @@ const LeaveHistory = ({leaves, isAdmin, onUpdate}) => {
                         {leave.status === "PENDING" && (
                           <div className="leave-actions">
                             <button
-                              onClick={() => handleStatusUpdate(leave._id || leave.id, "APPROVED")}
-                              disabled={!!processing}
+                              onClick={() => handleStatusUpdate(leaveId, "APPROVED")}
+                              disabled={updateStatusMutation.isPending}
                               className="leave-approve-button"
                             >
-                              {processing === (leave._id || leave.id) ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                              {processing && updateStatusMutation.variables?.status === "APPROVED" ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Check className="w-4 h-4" />
+                              )}
                             </button>
 
                             <button
-                              onClick={() => handleStatusUpdate(leave._id || leave.id, "REJECTED")}
-                              disabled={!!processing}
+                              onClick={() => handleStatusUpdate(leaveId, "REJECTED")}
+                              disabled={updateStatusMutation.isPending}
                               className="leave-reject-button"
                             >
-                              {processing === (leave._id || leave.id) ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                              {processing && updateStatusMutation.variables?.status === "REJECTED" ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <X className="w-4 h-4" />
+                              )}
                             </button>
                           </div>
                         )}

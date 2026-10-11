@@ -1,31 +1,39 @@
 import { CalendarDays, FileText, Loader2, Send, X } from "lucide-react";
-import { useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../../api/api";
 import toast from "react-hot-toast";
 
-
 const ApplyLeaveModal = ({open, onClose, onSuccess}) => {
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
   const minDate = tomorrow.toISOString().split('T')[0];
 
-  const handleSubmit = async(e) => {
+  const applyMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await api.post("/leave", data);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Leave application submitted successfully!");
+      queryClient.invalidateQueries({ queryKey: ["leaves"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      onSuccess?.();
+      onClose();
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || error?.message);
+    },
+  });
+
+  const loading = applyMutation.isPending;
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
-
-    try{
-      await api.post("/leave", data);
-      onSuccess();
-      onClose();
-    }catch(error){
-      toast.error(error.response?.data?.error || error?.message);
-    }finally{
-      setLoading(false);
-    }
+    applyMutation.mutate(data);
   }
   
   if(!open){
@@ -98,8 +106,15 @@ const ApplyLeaveModal = ({open, onClose, onSuccess}) => {
               type="submit"
               className="btn-primary flex-1 flex items-center justify-center gap-2"
             >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-              {loading ? "Submitting..." : "Submit"}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Submitting...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" /> Submit Application
+                </>
+              )}
             </button>
           </div>
         </form>
