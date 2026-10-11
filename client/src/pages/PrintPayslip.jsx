@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns"
 import Loading from "../components/Loading"
 import api from "../../api/api";
 
 const PrintPayslip = () => {
   const {id} = useParams();
-  const [payslip, setPayslip] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    api.get(`/payslips/${id}`)
-      .then((res) => setPayslip(res.data))
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [id])
+  const { data: payslip, isLoading: loading } = useQuery({
+    queryKey: ["payslips", id],
+    queryFn: async () => {
+      const res = await api.get(`/payslips/${id}`);
+      return res.data;
+    },
+    enabled: !!id,
+  });
 
   if(loading){
     return <Loading />
