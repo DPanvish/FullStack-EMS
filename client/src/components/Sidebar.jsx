@@ -1,17 +1,34 @@
-import { useState } from "react";
-import { dummyProfileData } from "../assets/assets";
-import { MenuIcon, UserIcon, XIcon, LayoutGridIcon, CalendarIcon, FileTextIcon, DollarSignIcon, SettingsIcon, ChevronRightIcon, LogOutIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { MenuIcon, UserIcon, XIcon, LayoutGridIcon, CalendarIcon, FileTextIcon, DollarSignIcon, SettingsIcon, ChevronRightIcon, LogOutIcon, Loader2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext"
+import api from "../../api/api";
 
 const Sidebar = () => {
   const { pathname } = useLocation();
+  const [userName, setUserName] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+  
+  const {user, loading, logout} = useAuth();
 
-  const role = "EMPLOYEE";
-  const userName = [dummyProfileData?.firstName, dummyProfileData?.lastName]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
+  useEffect(() => {
+    api
+      .get("/profile")
+      .then(({ data }) => {
+        if (data.firstName) {
+          setUserName(`${data.firstName} ${data.lastName || ""}`.trim());
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch profile in sidebar:", err);
+      });
+  }, []);
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+  
+  const role = user?.role;
   const userInitial = userName.charAt(0).toUpperCase();
 
   const navItems = [
@@ -25,6 +42,7 @@ const Sidebar = () => {
   ];
 
   const handleLogout  = () => {
+    logout();
     window.location.href = "/login";
   }
 
@@ -71,27 +89,34 @@ const Sidebar = () => {
       </div>
 
       <div className="flex-1 px-3 space-y-0.5 overflow-y-auto">
-        {navItems.map((item) => {
-          const isActive = pathname.startsWith(item.href);
-
-          return(
-            <Link
-              key={item.name}
-              to={item.href}
-              className={`group sidebar-nav-link ${isActive ? "sidebar-nav-link-active" : "sidebar-nav-link-inactive"}`}
-            >
-              {
-                isActive && 
-                <div className="sidebar-active-marker"/>
-              }
-
-              <item.icon className={`w-[17px] h-[17px] shrink-0 ${isActive ? "sidebar-nav-icon-active" : "sidebar-nav-icon-inactive"}`} />
-              <span className="flex-1">{item.name}</span>
-
-              {isActive && <ChevronRightIcon className="sidebar-active-chevron" />}
-            </Link>
-          )
-        })}
+        {loading ? (
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium text-indigo-200/70">
+            <Loader2 className="w-[17px] h-[17px] animate-spin text-indigo-300 shrink-0" />
+            <span>Loading...</span>
+          </div>
+        ) : (
+          navItems.map((item) => {
+            const isActive = pathname.startsWith(item.href);
+  
+            return(
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`group sidebar-nav-link ${isActive ? "sidebar-nav-link-active" : "sidebar-nav-link-inactive"}`}
+              >
+                {
+                  isActive && 
+                  <div className="sidebar-active-marker"/>
+                }
+  
+                <item.icon className={`w-[17px] h-[17px] shrink-0 ${isActive ? "sidebar-nav-icon-active" : "sidebar-nav-icon-inactive"}`} />
+                <span className="flex-1">{item.name}</span>
+  
+                {isActive && <ChevronRightIcon className="sidebar-active-chevron" />}
+              </Link>
+            )
+          })
+        )}
       </div>
 
       <div className="p-3 sidebar-divider-top">

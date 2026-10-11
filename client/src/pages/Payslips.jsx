@@ -25,7 +25,7 @@ const Payslips = () => {
     if(isAdmin){
       setEmployees(dummyEmployeeData)
     }
-  })
+  }, [isAdmin])
 
   if(loading){
     return <Loading />
