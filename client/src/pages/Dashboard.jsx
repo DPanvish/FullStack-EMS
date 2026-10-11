@@ -1,35 +1,35 @@
-import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query";
 import Loading from "../components/Loading";
 import EmployeeDashboard from "../components/EmployeeDashboard";
 import AdminDashboard from "../components/AdminDashboard";
 import api from "../../api/api";
-import toast from "react-hot-toast";
-
 
 const Dashboard = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: async () => {
+      const res = await api.get("/dashboard");
+      return res.data;
+    },
+  });
 
-  useEffect(() => {
-    api.get("/dashboard")
-      .then((res) => setData(res.data))
-      .catch((error) => toast.error(error.response?.data?.error || error?.message))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if(loading){
-    return <Loading />
+  if (isLoading) {
+    return <Loading />;
   }
 
-  if(!data){
-    return <p className="text-center text-slate-500 py-12">Failed to load dashboard</p>
+  if (error || !data) {
+    return (
+      <p className="text-center text-slate-500 py-12">
+        {error?.response?.data?.error || "Failed to load dashboard"}
+      </p>
+    );
   }
 
-  if(data.role === "ADMIN"){
-    return <AdminDashboard data={data} />
-  }else{
-    return <EmployeeDashboard data={data} />
+  if (data.role === "ADMIN") {
+    return <AdminDashboard data={data} />;
+  } else {
+    return <EmployeeDashboard data={data} />;
   }
-}
+};
 
-export default Dashboard
+export default Dashboard;
