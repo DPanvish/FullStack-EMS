@@ -1,11 +1,12 @@
 import { Loader2, Plus, X } from "lucide-react";
 import { useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../../api/api";
 import toast from "react-hot-toast";
 
 const GeneratePayslipForm = ({employees, onSuccess}) => {
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [selectedEmpId, setSelectedEmpId] = useState("");
   const [basicSalary, setBasicSalary] = useState("");
   const [allowances, setAllowances] = useState("");
@@ -33,22 +34,30 @@ const GeneratePayslipForm = ({employees, onSuccess}) => {
     }
   }
 
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    setLoading(true);
+  const generateMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await api.post("/payslips", data);
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Payslip generated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["payslips"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      setIsOpen(false);
+      onSuccess?.();
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || error?.message);
+    },
+  });
 
+  const loading = generateMutation.isPending;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
-
-    try{
-      await api.post("/payslips", data);
-      setIsOpen(false);
-      onSuccess();
-    }catch(error){
-      toast.error(error.response?.data?.error || error?.message);
-    }finally{
-      setLoading(false);
-    }
+    generateMutation.mutate(data);
   }
 
   if(!isOpen){
