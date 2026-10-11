@@ -41,8 +41,8 @@ const Sidebar = () => {
       { name: "Settings", href: "/settings", icon: SettingsIcon },
   ];
 
-  const handleLogout  = () => {
-    logout();
+  const handleLogout = async() => {
+    await logout();
     window.location.href = "/login";
   }
 
