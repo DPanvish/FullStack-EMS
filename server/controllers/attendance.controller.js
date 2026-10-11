@@ -92,7 +92,7 @@ export const getAttendance = async(req, res) => {
       .limit(limit)
       .lean();
 
-    return res.json({date: history, employee: {isDeleted: employee.isDeleted}})
+    return res.json({data: history, employee: {isDeleted: employee.isDeleted}})
   }catch(error){
     return res.status(500).json({error: "Failed to fetch attendance"});
   }
