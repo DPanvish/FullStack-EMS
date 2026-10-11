@@ -1,21 +1,31 @@
 import { PencilIcon, Trash2Icon } from "lucide-react"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../api/api";
 import toast from "react-hot-toast";
 
-
 const EmployeeCard = ({employee, onDelete, onEdit}) => {
-  
-  const handleDelete = async() => {
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await api.delete(`/employees/${employee.id || employee._id}`);
+    },
+    onSuccess: () => {
+      toast.success("Employee deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      onDelete?.();
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.error || error.message);
+    },
+  });
+
+  const handleDelete = () => {
     if(!confirm("Are you sure you want to delete this employee ?")){
       return;
     }
-
-    try{
-      await api.delete(`/employees/${employee.id}`);
-      onDelete();
-    }catch(error){
-      toast.error(error.response?.data?.error || error.message);
-    }
+    deleteMutation.mutate();
   }
   return (
     <div className="group employee-card">
