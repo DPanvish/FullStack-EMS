@@ -1,46 +1,67 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../api/api";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({children}){
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  const refreshSession = async() => {
-    try{
-      const { data } = await api.get("/auth/session");
-      setUser(data.user);
-    }catch(error){
-      setUser(null);
-    }finally{
-      setLoading(false);
-    }
-  }
+  const {
+    data: sessionUser,
+    isLoading: loading,
+    refetch: refreshSession
+  } = useQuery({
+    queryKey: ["auth", "session"],
+    queryFn: async () => {
+      try {
+        const { data } = await api.get("/auth/session");
+        return data?.user || null;
+      } catch (error) {
+        return null;
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-  useEffect(() => {
-    // Clean up any legacy localStorage tokens
-    localStorage.removeItem("token");
-    refreshSession();
-  }, []);
+  const user = sessionUser ?? null;
 
-  const login = async(email, password, role_type) => {
-    const { data } = await api.post("/auth/login", {email, password, role_type});
-    setUser(data.user);
-    return data.user;
-  }
+  const loginMutation = useMutation({
+    mutationFn: async ({ email, password, role_type }) => {
+      const { data } = await api.post("/auth/login", { email, password, role_type });
+      return data.user;
+    },
+    onSuccess: (newUser) => {
+      queryClient.setQueryData(["auth", "session"], newUser);
+      queryClient.invalidateQueries();
+    },
+  });
 
-  const logout = async() => {
-    try{
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
       await api.post("/auth/logout");
-    }catch(error){
-      console.error("Logout error:", error);
-    }finally{
-      setUser(null);
-    }
-  }
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(["auth", "session"], null);
+      queryClient.clear();
+    },
+  });
 
-  const value = {user, token: null, loading, login, logout, refreshSession};
+  const login = async (email, password, role_type) => {
+    return await loginMutation.mutateAsync({ email, password, role_type });
+  };
+
+  const logout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+    } catch (e) {
+      console.error(e);
+      queryClient.setQueryData(["auth", "session"], null);
+      queryClient.clear();
+    }
+  };
+
+  const value = { user, token: null, loading, login, logout, refreshSession };
 
   return <AuthContext.Provider value={value}>
     {children}
