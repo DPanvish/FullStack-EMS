@@ -33,6 +33,7 @@ export const getEmployees = async(req, res) => {
 // Create Employee
 // POST /api/employees
 export const createEmployee = async(req, res) => {
+  let createdUser = null;
   try{
     const {firstName, lastName, email, phone, position, department, basicSalary, allowances, deductions, joinDate, password, role, bio} = req.body;
 
@@ -47,14 +48,14 @@ export const createEmployee = async(req, res) => {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({
+    createdUser = await User.create({
       email, 
       password: hashed,
       role: role || "EMPLOYEE"
     })
 
     const employee = await Employee.create({
-      userId: user._id,
+      userId: createdUser._id,
       firstName,
       lastName,
       email,
@@ -70,8 +71,13 @@ export const createEmployee = async(req, res) => {
 
     return res.status(201).json({success: true, employee});
   }catch(error){
+    // Clean up created user if employee creation failed to prevent orphaned records
+    if(createdUser?._id){
+      await User.findByIdAndDelete(createdUser._id).catch(() => {});
+    }
+
     if(error.code === 11000){
-      return res.status(400).json({error: "Email already exist"});
+      return res.status(400).json({error: "Email already exists"});
     }
 
     console.error("Create employee error: ", error);
@@ -91,6 +97,14 @@ export const updateEmployee = async(req, res) => {
 
     if(!employee){
       return res.status(404).json({error: "Employee not found"})
+    }
+
+    // Verify email conflict before modifying
+    if(email && email !== employee.email){
+      const existingUser = await User.findOne({email, _id: {$ne: employee.userId}});
+      if(existingUser){
+        return res.status(400).json({error: "Email already exists"});
+      }
     }
 
     await Employee.findByIdAndUpdate(id, {
@@ -122,10 +136,10 @@ export const updateEmployee = async(req, res) => {
     return res.json({success: true});
   }catch(error){
     if(error.code === 11000){
-      return res.status(400).json({error: "Email already exist"});
+      return res.status(400).json({error: "Email already exists"});
     }
 
-    return res.status(500).json({error: "Failed to create employee"});
+    return res.status(500).json({error: "Failed to update employee"});
   }
 }
 
