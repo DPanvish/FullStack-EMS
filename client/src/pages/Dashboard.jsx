@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
-import { dummyEmployeeDashboardData, dummyAdminDashboardData } from "../assets/assets"
 import Loading from "../components/Loading";
 import EmployeeDashboard from "../components/EmployeeDashboard";
 import AdminDashboard from "../components/AdminDashboard";
+import api from "../../api/api";
+import toast from "react-hot-toast";
 
 
 const Dashboard = () => {
@@ -10,10 +11,10 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setData(dummyAdminDashboardData);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000)
+    api.get("/dashboard")
+      .then((res) => setData(res.data))
+      .catch((error) => toast.error(error.response?.data?.error || error?.message))
+      .finally(() => setLoading(false));
   }, []);
 
   if(loading){
