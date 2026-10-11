@@ -1,46 +1,30 @@
-import { useCallback, useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query";
 import Loading from "../components/Loading"
 import CheckInButton from "../components/attendance/CheckInButton";
 import AttendanceStats from "../components/attendance/AttendanceStats";
 import AttendanceHistory from "../components/attendance/AttendanceHistory";
 import api from "../../api/api";
-import toast from "react-hot-toast";
 
 const Attendence = () => {
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isDeleted, setIsDeleted] = useState(false);
-
-  const fetchData = useCallback(async () => {
-    try{
+  const { data: attendanceData, isLoading: loading } = useQuery({
+    queryKey: ["attendance"],
+    queryFn: async () => {
       const res = await api.get("/attendance");
-      const json = res.data;
-
-      setHistory(json.data || []);
-
-      if(json.employee?.isDeleted){
-        setIsDeleted(true);
-      }
-    }catch(error){
-      toast.error(error?.response?.data?.error || error?.message);
-    }finally{
-      setLoading(false);
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+      return res.data;
+    },
+  });
 
   if(loading){
     return <Loading />
   }
 
+  const history = attendanceData?.data || attendanceData?.date || [];
+  const isDeleted = !!attendanceData?.employee?.isDeleted;
+
   const today = new Date();
   today.setHours(0, 0 , 0, 0);
 
   const todayRecord = history.find((r) => new Date(r.date).toDateString() === today.toDateString());
-
 
   return (
     <div className="animate-fade-in">
@@ -55,7 +39,7 @@ const Attendence = () => {
         </div>
       ) : (
         <div className="mb-8">
-          <CheckInButton todayRecord={todayRecord} onAction={fetchData} />
+          <CheckInButton todayRecord={todayRecord} />
         </div>
       )}
 

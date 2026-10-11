@@ -1,22 +1,31 @@
 import { Loader2Icon, LogInIcon, LogOutIcon } from "lucide-react";
-import { useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "../../../api/api";
 import toast from "react-hot-toast";
 
-
 const CheckInButton = ({todayRecord, onAction}) => {
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const handleAttendance = async () => {
-    setLoading(true);
-    try{
-      await api.post("/attendance");
-      onAction();
-    }catch(error){
+  const attendanceMutation = useMutation({
+    mutationFn: async () => {
+      const res = await api.post("/attendance");
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.type === "CHECK_IN" ? "Clocked in successfully!" : "Clocked out successfully!");
+      queryClient.invalidateQueries({ queryKey: ["attendance"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      onAction?.();
+    },
+    onError: (error) => {
       toast.error(error?.response?.data?.error || error?.message);
-    }finally{
-      setLoading(false);
-    }
+    },
+  });
+
+  const loading = attendanceMutation.isPending;
+
+  const handleAttendance = () => {
+    attendanceMutation.mutate();
   }
 
   if(todayRecord?.checkOut){
