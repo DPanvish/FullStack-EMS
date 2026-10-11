@@ -49,7 +49,11 @@ const AttendanceHistory = ({history}) => {
                     </td>
 
                     <td className="px-6 py-4">
-                      {dayType.label !== "-" ? <span className={`badge ${dayType.className}`}>{dayType.label}</span>: "-"}
+                      {dayType.label && dayType.label !== "-" && dayType.label !== "—" ? (
+                        <span className={`badge ${dayType.className}`}>{dayType.label}</span>
+                      ) : (
+                        "—"
+                      )}
                     </td>
 
                     <td className="px-6 py-4">
